@@ -142,25 +142,31 @@ public class Point {
 	}
 	
 	public void setLatLonFromMinDec(){
-		latDegreesDecDeg = latMinutesDecDeg + (latMinutesDecMin / 60);
-		lonDegreesDecDeg = lonMinutesDecDeg + (lonMinutesDecMin / 60);
-				
+		if(latMinutesDecDeg < 0) 
+			latDegreesDecDeg = latMinutesDecDeg - (latMinutesDecMin / 60);
+		else
+			latDegreesDecDeg = latMinutesDecDeg + (latMinutesDecMin / 60);
+		if(lonMinutesDecDeg < 0)
+			lonDegreesDecDeg = lonMinutesDecDeg - (lonMinutesDecMin / 60);
+								
 		latSecondsDecDeg = latMinutesDecDeg;
 		latSecondsDecMin = (int) latMinutesDecMin;
 		latSecondsDecSec = (latMinutesDecMin - ((int) latMinutesDecMin)) * 60;
 		lonSecondsDecDeg = lonMinutesDecDeg;
 		lonSecondsDecMin = (int) lonMinutesDecMin;
 		lonSecondsDecSec = (lonMinutesDecMin - ((int) lonMinutesDecMin)) * 60;
+
 	}
 	
 	public void setLatLonFromSecDec(){
-		latDegreesDecDeg = latSecondsDecDeg + (latSecondsDecMin / 60) + (latSecondsDecSec / 3600);
-		lonDegreesDecDeg = lonSecondsDecDeg + (lonSecondsDecMin / 60) + (lonSecondsDecSec / 3600);
-		
 		latMinutesDecDeg = latSecondsDecDeg;
 		latMinutesDecMin = latSecondsDecMin + (latSecondsDecSec / 60);
 		lonMinutesDecDeg = lonSecondsDecDeg;
 		lonMinutesDecMin = lonSecondsDecMin + (lonSecondsDecSec /60);
+			
+		setLatLonFromMinDec();	
+			
+			
 	}
 	
 	public void setLatLonFromEastNorth(){
