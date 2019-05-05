@@ -1839,8 +1839,10 @@ public class MapConverterFX extends Application {
         about.setEditable(false);
         about.setText(""
         		+ "Copyright (C) 2017  Piotr Czapik.\n"
+        		+ "Copyright (C) 2019  Piotr Czapik.\n"
+        		
         		+ "@author Piotr Czapik\n" 
-        		+ "@version 4.01\n"
+        		+ "@version 4.5\n"
         		+ "\n"
         		+ "This file is part of Map Calculator Converter.\n"
         		+ "Map Calculator is free software: you can redistribute it and/or modify\n"
@@ -1885,7 +1887,7 @@ public class MapConverterFX extends Application {
 
         
         primaryStage.setScene(scene);
-        primaryStage.setTitle(" Map Calculator v3.0 beta");
+        primaryStage.setTitle(" Map Calculator v4.5");
         setUserAgentStylesheet(STYLESHEET_CASPIAN);
         primaryStage.show();
         
