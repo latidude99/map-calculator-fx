@@ -4,9 +4,8 @@
 * @license GPLv2
 */ 
 
-package piotr;
+package com.latidude99.mapcalculatorfx;
 
-import javafx.application.*;
 import javafx.collections.ObservableList;
 import javafx.stage.*;
 import javafx.scene.*;

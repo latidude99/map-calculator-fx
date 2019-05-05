@@ -6,7 +6,7 @@
 // of the GNU Public License, version 2.
 
 
-package piotr;
+package com.latidude99.mapcalculatorfx;
 
 import uk.me.jstott.jcoord.LatLng;
 import uk.me.jstott.jcoord.OSRef;

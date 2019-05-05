@@ -4,7 +4,7 @@
 * @license GPLv2
 */ 
 
-package piotr;
+package com.latidude99.mapcalculatorfx;
 
 import java.lang.Math;
 

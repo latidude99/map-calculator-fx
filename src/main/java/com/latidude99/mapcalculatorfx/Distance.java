@@ -4,7 +4,7 @@
 * @license GPLv2
 */ 
 
-package piotr;
+package com.latidude99.mapcalculatorfx;
 
 public class Distance {
 	    private double dist = 0; //distance in metres

@@ -4,7 +4,7 @@
 * @license GPLv2
 */ 
 
-package piotr;
+package com.latidude99.mapcalculatorfx;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -12,9 +12,6 @@ import java.io.File;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.logging.Level;
-
-import com.sun.javafx.logging.Logger;
 
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
