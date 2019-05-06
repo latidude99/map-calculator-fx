@@ -101,7 +101,7 @@ You need to enter values into two out of the three fields (map + ground distance
 and the remaining field is calculated along with the missing values for all the units.
 
 <p align="center">
-<img src="images/tab2.JPG" width=100%>
+<img src="images/help_TabB_1.png" width=100%>
 </p>
 
 <p align="center">
@@ -124,7 +124,7 @@ Part of calculations on this screen make use of the excellent JCoord library
 At any stage coordinates of either point can be reset and corrected manually.
 
 <p align="center">
-<img src="images/tab3.JPG" width=100%> 
+<img src="images/help_TabC_1.png" width=100%> 
 </p>
 
 <p align="center">
