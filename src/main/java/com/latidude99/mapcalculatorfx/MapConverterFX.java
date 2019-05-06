@@ -58,6 +58,13 @@ import javafx.stage.Stage;
 import javafx.util.converter.IntegerStringConverter;
 
 public class MapConverterFX extends Application {
+
+    private final String IMAGE_TAB_B1 = "images/help_TabB_1.png";
+    private final String IMAGE_TAB_C1 = "images/help_TabC_1.png";
+    private final String IMAGE_TAB_C2 = "images/help_TabC_2.png";
+    private final String IMAGE_TAB_D1 = "images/help_TabD_1.png";
+    private final String IMAGE_TAB_D2 = "images/help_TabD_2.png";
+
 	
     //------------- controls for Scale Converter --------------------
 	
@@ -797,7 +804,7 @@ public class MapConverterFX extends Application {
         buttonHelpTabB.setMaxHeight(40);
         buttonHelpTabB.setMinWidth(70);
         buttonHelpTabB.setOnAction
-        				(e -> ImageBoxSingle.show("Help for Distance Calculator", "Help", "help_TabB_1.png"));
+        				(e -> ImageBoxSingle.show("Help for Distance Calculator", "Help", IMAGE_TAB_B1));
 
         
         
@@ -1564,7 +1571,7 @@ public class MapConverterFX extends Application {
         	}
         });
         
-        buttonHelp.setOnAction(e -> ImageBox.show("Help for Coordinate Converter", "Help", "help_TabC_1.png", "help_TabC_2.png"));
+        buttonHelp.setOnAction(e -> ImageBox.show("Help for Coordinate Converter", "Help", IMAGE_TAB_C1, IMAGE_TAB_C2));
         
         
                 
@@ -1942,7 +1949,7 @@ public class MapConverterFX extends Application {
         									labelPointDeleted.setText(table.getItems().size() + " pts");
         								});
         
-        buttonHelpTabD.setOnAction(e -> ImageBox.show("Area Calculator Help", "Help", "help_TabD_1.png", "help_TabD_2.png"));
+        buttonHelpTabD.setOnAction(e -> ImageBox.show("Area Calculator Help", "Help", IMAGE_TAB_D1, IMAGE_TAB_D2));
         
         textPointNum.textProperty().addListener((obs, oldVal, newVal) -> textPointNum.setText(newVal.replaceAll("[^0-9]", "")));
         textPointNum.setOnKeyPressed(new EventHandler<KeyEvent>(){

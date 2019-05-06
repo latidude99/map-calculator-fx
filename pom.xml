@@ -59,7 +59,7 @@
                             <tasks>
                                 <mkdir dir="${project.build.directory}/images" />
                                 <copy todir="${basedir}/target/images">
-                                    <fileset dir="${basedir}/src/main/resources/images" includes="**/*" />
+                                    <fileset dir="${basedir}/src/main/resources/images/" includes="**/*" />
                                 </copy>
                             </tasks>
                         </configuration>

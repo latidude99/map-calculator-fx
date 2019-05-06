@@ -39,7 +39,7 @@
             <includes>
                 <include>${artifactId}-${version}-shaded.jar</include>
                 <include>MapCalculatorFX_${version}.exe</include>
-                <include>scr/main/resources/images/**</include>
+                <include>images/**</include>
             </includes>
             <outputDirectory>/</outputDirectory>
         </fileSet>
