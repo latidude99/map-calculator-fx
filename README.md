@@ -74,7 +74,7 @@ the .exe file.
 
 There are 4 tabs, each serving different set of calculation/conversion.
 
-**Tab1 - Scale Converter**
+### Tab1 - Scale Converter
 
 Converting map scales between each other expressed in 5 different map scale formats.
 A value entered in one of the formats gets converted into the remaining four.
@@ -86,10 +86,10 @@ A value entered in one of the formats gets converted into the remaining four.
  - Metric/kilometres to a centimetre (eg. 2km to a cm)
  
 <p align="center">
-	<img src="images/tab1.JPG" width=70%>
+	<img src="images/tab1.JPG" width=100%>
 </p>
 
-**Tab2 - Distance Calculator**
+### Tab2 - Distance Calculator
 
 There are three sets of entry fields:
 
@@ -100,9 +100,16 @@ There are three sets of entry fields:
 You need to enter values into two out of the three fields (map + ground distance, map distance + scale or ground distance + scale) 
 and the remaining field is calculated along with the missing values for all the units.
 
-<img src="images/tab2.JPG" width=45%> <img src="images/tab2a.JPG" width=45%>
+<p align="center">
+<img src="images/tab2.JPG" width=100%>
+</p>
 
-**Tab3 - Coordinate Converter**
+<p align="center">
+<img src="images/tab2a.JPG" width=100%>
+</p>
+
+
+### Tab3 - Coordinate Converter
 
 Part of calculations on this screen make use of the excellent JCoord library
 
@@ -116,9 +123,15 @@ Part of calculations on this screen make use of the excellent JCoord library
 
 At any stage coordinates of either point can be reset and corrected manually.
 
-<img src="images/tab3.JPG" width=45%> <img src="images/tab3b.JPG" width=45%>
+<p align="center">
+<img src="images/tab3.JPG" width=100%> 
+</p>
 
-**Tab4 - Area & Perimeter Calculator**
+<p align="center">
+<img src="images/tab3b.JPG" width=100%>
+</p>
+
+### Tab4 - Area & Perimeter Calculator
 
 Given coordinates of at least three points calculates area and perimeter of a closed shape
 
@@ -136,18 +149,18 @@ Given coordinates of at least three points calculates area and perimeter of a cl
  - points from the table can be submitted as left/right points for calculations in the Tab3 (Coordinate Converter)
 
 <p align="center">
-	<img src="images/help_TabD_1.png" width=70%>
+	<img src="images/help_TabD_1.png" width=100%>
 </p>
 
 <p align="center">
-	<img src="images/tab4c.JPG" width=70%>
+	<img src="images/tab4c.JPG" width=100%>
 </p>
 
 
 
 # Status
-Development: Closed
-Bug fixing: Open
+- Development: Closed
+- Bug fixing: Open
 
 # License
 MapCalculatorFX is free software: you can redistribute it and/or modify it under the terms of the GNU General Public 
