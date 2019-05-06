@@ -65,14 +65,14 @@ nb-configuration.xml
 ## OS X
 ##########################
 .DS_Store
-/target/
+target/
 !.mvn/wrapper/maven-wrapper.jar
 
 ### STS ###
 .apt_generated
-.classpath
+#.classpath
 .factorypath
-.project
+#.project
 .settings
 .springBeans
 .sts4-cache

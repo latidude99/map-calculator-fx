@@ -30,6 +30,10 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.geometry.*;
 
+/*
+ * Generic info window, has to be closed to continue
+ */
+
 public class MessageBox {
     public static void show(String message, String title) {
         

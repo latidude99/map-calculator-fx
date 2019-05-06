@@ -22,6 +22,14 @@ package com.latidude99.mapcalculatorfx;
 import uk.me.jstott.jcoord.LatLng;
 import uk.me.jstott.jcoord.OSRef;
 
+/*
+ * Stores all point coordinates as Ordnance Survey grid references
+ * (Six Figure reference and 6 digit Easting /6 digit Northing)
+ * as well as Latitude / Longitude.
+ * Also, includes all the necessary utility methods to convert one to another
+ * Makes use of the JCoord v1.0 library
+ */
+
 public class Point {
 	
 	private double easting;
@@ -192,7 +200,6 @@ public class Point {
 	
 	public void setLatLonFromOSSixFigure(){
 		OSRef os = new OSRef(osSixFigure);
-		//System.out.println(osSixFigure);
 		LatLng latLng = os.toLatLng();
 		latLng.toWGS84();
 		latDegreesDecDeg = latLng.getLat();
@@ -235,22 +242,6 @@ public class Point {
 		
 }
 
-/*
- * Convert Six-Figure OS Grid Reference String to an OSRef Object
- * 
- * To convert a string representing a six-figure OSGB grid reference:
- *
-
-System.out
-    .println("Convert Six-Figure OS Grid Reference String to an OSRef Object");
-String os6 = "TG514131";
-System.out.println("Six figure string: " + os6);
-OSRef os6x = new OSRef(os6);
-System.out.println("Converted to OS Grid Ref: " + os6x.toString() + " - "
-    + os6x.toSixFigureString());
-System.out.println();
-
-*/
 
 
 

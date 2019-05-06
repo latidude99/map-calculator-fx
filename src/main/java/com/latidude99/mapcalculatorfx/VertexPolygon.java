@@ -32,6 +32,15 @@ import javafx.collections.ObservableList;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 
+/*
+ * Methods for reading polygons from a file to an observable list and vice versa.
+ * 4 formats supported:
+ *  - comma separated without line number - [easting] [comma] [northing]
+ *  - comma separated with line number - [number] [easting] [comma] [northing]
+ *  - space/tab separated without line number - [easting] [space/tab] [northing]
+ *  - space/tab separated with line number - [number] [easting] [space/tab] [northing]
+ */
+
 public class VertexPolygon{
     
     public static ObservableList<Vertex> readPolygonSinNum_space(){
@@ -161,7 +170,6 @@ public class VertexPolygon{
 		            }
 	        }catch(IOException e){
 	            MessageBox.show("File not saved", "Output error");
-	            //Logger.getLogger(Vertex.class.getVertexNum()).log(Level.SEVERE, null, ex);
 	        }
         }
     }
@@ -181,7 +189,6 @@ public class VertexPolygon{
 	            }
 	        }catch(IOException e){
 	            MessageBox.show("File not saved", "Output error");
-	            //Logger.getLogger(Vertex.class.getVertexNum()).log(Level.SEVERE, null, ex);
 	        }
         }
     }
@@ -201,7 +208,6 @@ public class VertexPolygon{
 	            }
 	        }catch(IOException e){
 	            MessageBox.show("File not saved", "Output error");
-	            //Logger.getLogger(Vertex.class.getVertexNum()).log(Level.SEVERE, null, ex);
 	        }
         }
     }
@@ -220,7 +226,6 @@ public class VertexPolygon{
 	            }
 	        }catch(IOException e){
 	            MessageBox.show("File not saved", "Output error");
-	            //Logger.getLogger(Vertex.class.getVertexNum()).log(Level.SEVERE, null, ex);
 	        }
         }
     }

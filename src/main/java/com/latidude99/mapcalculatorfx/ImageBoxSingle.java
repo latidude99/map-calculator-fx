@@ -34,6 +34,10 @@ import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.geometry.*;
 
+/*
+ * Generic pane to display images, used to show help screens (1 image)
+ */
+
 public class ImageBoxSingle{
     public static void show(String message, String title, String imageName) {
         
@@ -59,7 +63,6 @@ public class ImageBoxSingle{
         Button btnClose = new Button();
         btnClose.setText(" Close ");
         btnClose.setPrefWidth(80);
-        //btnClose.setAlignment(Pos.BOTTOM_RIGHT);
         btnClose.setOnAction(e -> stage.close());
         btnClose.setOnKeyPressed(e -> stage.close());
         HBox paneClose = new HBox(btnClose);

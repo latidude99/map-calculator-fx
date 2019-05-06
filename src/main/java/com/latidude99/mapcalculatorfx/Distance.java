@@ -20,8 +20,16 @@
 
 package com.latidude99.mapcalculatorfx;
 
+/*
+ * Converts distance between metres, kilometres, feet, statue miles and nautical miles
+ */
+
 public class Distance {
-	    private double dist = 0; //distance in metres
+
+	/*
+	 * Distance in metres
+	 */
+	private double dist = 0;
 
 	public double getDist() {
 		return dist;
@@ -37,9 +45,12 @@ public class Distance {
 	public double distMileStatue(double dist){
 		return dist / 1609.3440;
 	}
-    	
+
+	/*
+	 * This is the US (International) Nautical Mile, the UK Nautical Mile is 1853.184 metres
+	 */
 	public double distMileNautical(double dist){
-		return dist / 1852; //this is US/Int Naut Mile, the UK Naut Mile is 1853.184m 
+		return dist / 1852;
 	}
 	
 	public double distMetre(double dist){
@@ -51,17 +62,4 @@ public class Distance {
 	}
     
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 

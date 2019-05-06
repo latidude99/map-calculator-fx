@@ -32,9 +32,18 @@ import javafx.scene.transform.Scale;
 import javafx.scene.control.*;
 import javafx.geometry.*;
 
+/*
+ * Generic pane, displays polygons read from an observable table, used in TabD.
+ * Does not preserve geometry, its sole purpose is to conduct a visual
+ * check if the polygon in question is not self-intersecting.
+ * Although such polygons may occur in real life it is extremely rare.
+ * In those cases it is better to treat polygons (fields) like that as
+ * two separate entities and calculate its area and perimeter separately.
+ */
+
 public class PolygonBox {
+
     public static void show(String message, String title, ObservableList<Vertex> vertexes) {
-        
         Stage stage = new Stage();
         //stage.initModality(Modality.APPLICATION_MODAL);
         stage.setTitle(title);
@@ -47,7 +56,9 @@ public class PolygonBox {
         int minN = 10000000;
         int maxE = 0;
         int maxN = 0;
-        
+
+
+        // calculates the extends of a polygon
         for(Vertex v: vertexes){
         	if(v.getEasting() < minE)
         		minE = v.getEasting();
@@ -58,16 +69,8 @@ public class PolygonBox {
         	if(v.getNorthing() > maxN)
         		maxN = v.getNorthing();
         }
-        
-                
-  /*      private double normMinMax(int value, int min, int max){  // normalization between lowest and highest
-            double result;                                      // min, max calculated from the list for easting and northing
-            double lowest = 20;
-            double highest = 400;
-            result = (((highest - lowest) * (value - min)) / (max - min)) + lowest;
-            return (double) result;
-        }
- */                 
+
+        // normalizes coordinates of a polygon (makes it fit the window canvas area)
         int num = vertexes.size();
         Double[] points = new Double[num * 2];
         int n = 0;
@@ -76,23 +79,16 @@ public class PolygonBox {
             points[n+1] =(((highestN - lowest) * (v.getNorthing() - minN)) / (maxN - minN)) + lowest;
             n = n + 2;
         }
-        
-  /*      System.out.println(polygon.getPoints().toString());
-        System.out.println(points.length);
-        System.out.println("n= " + n);
-        System.out.println("min - max E " + minE + " - " + maxE);
-        System.out.println("min - max N " + minN + "   " + maxN);
-        
-        for(int i=0; i < n; i=i+2){
-        	System.out.println(points[i] + "  " + points[i+1]);
-        }
-    */      
+
+        // creates polygon out of normalized points
         Polygon polygon = new Polygon();
         polygon.getPoints().addAll(points);
         polygon.setFill(Color.WHITE);
         polygon.setStrokeWidth(1);
         polygon.setStroke(Color.BLUE);
-        
+
+        // adds polygon to pane and reverts Y axis to conform with the OS coordinate system
+        // where Y values increase towards North
         Pane panePolygon = new Pane(polygon);
         Scale scale = new Scale();
         scale.setX(1);
@@ -133,22 +129,3 @@ public class PolygonBox {
         stage.show();
         }
 }
-/*
-  polygon.getPoints().addAll(100d,100d,200d,50d,400d,100d,200d,150d);
-        polygon.setFill(Color.SKYBLUE);
-        polygon.setStrokeWidth(3);
-        polygon.setStroke(Color.BLACK);
-*/
-
-
-
-
-
-
-
-
-
-
-
-
-

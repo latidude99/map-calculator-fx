@@ -20,6 +20,10 @@
 
 package com.latidude99.mapcalculatorfx;
 
+/*
+ * Polygon points, used in TabD to display polygons from the table
+ */
+
 public class Vertex{
     int number;
     int easting;
@@ -59,22 +63,4 @@ public class Vertex{
     }
     
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
