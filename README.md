@@ -1,4 +1,4 @@
-# SubsConverterFX
+# MapCalculatorFX
 
 [![](https://img.shields.io/badge/release-4.5-blue.svg)](https://github.com/latidude99/map-calculator-fx)
 [![License: GPL v3](https://img.shields.io/badge/license-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
