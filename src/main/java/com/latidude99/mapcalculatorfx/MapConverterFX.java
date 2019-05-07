@@ -54,140 +54,176 @@ import javafx.scene.text.Font;
 import javafx.scene.text.FontWeight;
 import javafx.scene.text.Text;
 import javafx.scene.text.TextAlignment;
+import javafx.scene.transform.Scale;
 import javafx.stage.Stage;
 import javafx.util.converter.IntegerStringConverter;
 
+/*
+ * This class include the app's GUI and most of the calculations.
+ * The GUI is built here, programmatically instead of declaring
+ * Views in FXML files with Controllers (MVC pattern) to see if
+ * this would be a viable alternative and learn building GUI with
+ * Java code.
+ *
+ * Created after a few months of learning Java and programming at all.
+ *
+ * Although it should be split in multiple classes, it is left as
+ * originally written (with repeating blocks of code here and there)
+ * mainly to remind me how NOT to do it in the future.
+ *
+ * The only things changed/added later are one major bug fix,
+ * comments and JUnit5 tests. Also unused lines of code were deleted.
+ */
+
 public class MapConverterFX extends Application {
 
+    /*
+     * Location of the help images
+     */
     private final String IMAGE_TAB_B1 = "images/help_TabB_1.png";
     private final String IMAGE_TAB_C1 = "images/help_TabC_1.png";
     private final String IMAGE_TAB_C2 = "images/help_TabC_2.png";
     private final String IMAGE_TAB_D1 = "images/help_TabD_1.png";
     private final String IMAGE_TAB_D2 = "images/help_TabD_2.png";
 
-	
-    //------------- controls for Scale Converter --------------------
-	
-    TextField txtScaleFra,  txtScaleImpIn; TextField txtScaleImpMile; TextField txtScaleMetricCm; TextField txtScaleMetricKm;
-    Text txtFra1; Button btnClear; Button btnConvertFra; Button btnConvertIn; Button btnConvertMile; Button btnConvertCm; Button btnConvertKm;
-    Label lblScaleFra; Label lblScaleImpIn; Label lblScaleImpMile; Label lblScaleMetricCm; Label lblScaleMetricKm;  
-    Text resultFra; Text resultIn; Text resultMile; Text resultCm; Text resultKm;
+    /**
+     * File formats for drop down lists, TabD
+     */
+    final static String SPACE_SIN_NUMBER = "easting northing (separated with space)";
+    final static String COMMA_SIN_NUMBER = "easting,northing (separated with comma)";
+    final static String SPACE_WITH_NUMBER = "number easting northing (separated with space)";
+    final static String COMMA_WITH_NUMBER = "number,easting,northing (separated with comma)";
+
+
+    /*
+     *  Controls declarations for Scale Converter, TabA
+     */
+    TextField txtScaleFra,  txtScaleImpIn; TextField txtScaleImpMile; TextField txtScaleMetricCm;
+    TextField txtScaleMetricKm; Text txtFra1; Button btnClear; Button btnConvertFra; Button btnConvertIn;
+    Button btnConvertMile; Button btnConvertCm; Button btnConvertKm; Label lblScaleFra; Label lblScaleImpIn;
+    Label lblScaleImpMile; Label lblScaleMetricCm; Label lblScaleMetricKm; Text resultFra; Text resultIn;
+    Text resultMile; Text resultCm; Text resultKm;
+
+
+    /*
+     *  Controls declarations for Distance Calculator, TabB
+     */
+    Label lblMm; Label lblCm; Label lblIn; Label lblKm; Label lblMetre; Label lblMile;
+    Label lblFt; Label lblYard; Label lblScaleFractional; Label lblScaleInch;
+    Label lblScaleMile; Label lblScaleCm; Label lblScaleMetre; Label lblScaleKm;
     
-  //------------- controls for Distance Calculator ------------------
-    
-    Label lblMm; Label lblCm; Label lblIn; Label lblKm; Label lblMetre; Label lblMile; Label lblFt; Label lblYard;
-    Label lblScaleFractional; Label lblScaleInch; Label lblScaleMile; Label lblScaleCm; Label lblScaleMetre; Label lblScaleKm;
-    
-    TextField txtMm; TextField txtCm; TextField txtIn; TextField txtKm; TextField txtMetre; TextField txtMile;  TextField txtFt; TextField txtYard;
-    TextField txtScaleFractional; TextField txtScaleInch; TextField txtScaleMile; TextField txtScaleCm; TextField txtScaleMetre; TextField txtScaleKm;
+    TextField txtMm; TextField txtCm; TextField txtIn; TextField txtKm; TextField txtMetre;
+    TextField txtMile;  TextField txtFt; TextField txtYard; TextField txtScaleFractional; TextField txtScaleInch;
+    TextField txtScaleMile; TextField txtScaleCm; TextField txtScaleMetre; TextField txtScaleKm;
     
     Button buttonHelpTabB = new Button(); Label labelGapHelp = new Label();
     
-    Label lblGap3 = new Label(); Label lblGap3a = new Label(); Label lblGap3b = new Label(); Label lblGap3c = new Label();
-    Label lblGap3d = new Label(); Label lblGap3e = new Label();
-    Label lblGap2 = new Label(); Label lblGap2a = new Label(); Label lblGap2b = new Label(); Label lblGap2c = new Label();
-    Label lblGap2d = new Label();
-    Label lblGap1 = new Label(); Label lblGap1a = new Label(); Label lblGap1b = new Label();
-    
-  //------------- controls for Coordinates Calculator ----------------
-    
+    Label lblGap3 = new Label(); Label lblGap3a = new Label(); Label lblGap3b = new Label();
+    Label lblGap3c = new Label(); Label lblGap3d = new Label(); Label lblGap3e = new Label();
+    Label lblGap2 = new Label(); Label lblGap2a = new Label(); Label lblGap2b = new Label();
+    Label lblGap2c = new Label(); Label lblGap2d = new Label(); Label lblGap1 = new Label();
+    Label lblGap1a = new Label(); Label lblGap1b = new Label();
+
+
+    /*
+     *  Controls declarations for Coordinates Calculator, TabC
+     */
     Label labelLeftPoint = new Label();  Label labelRightPoint = new Label();
     
     Button buttonLeftPointConvert = new Button(); Button buttonLeftPointClear = new Button();
     Button buttonRightPointConvert = new Button(); Button buttonRightPointClear = new Button();
     
-    Label labelLeftOS = new Label(); Label labelLeftOSEast = new Label(); Label labelLeftOSNorth = new Label(); Label labelLeftOsSixFigure = new Label();
+    Label labelLeftOS = new Label(); Label labelLeftOSEast = new Label();
+    Label labelLeftOSNorth = new Label(); Label labelLeftOsSixFigure = new Label();
     Label labelLeftLat = new Label(); Label labelLeftWGS84_degDec_Lat = new Label();
-    Label labelLeftWGS84_minDec_Lat = new Label(); Label labelLeftWGS84_degDecMin_Lat = new Label(); Label labelLeftWGS84_minDecMin_Lat = new Label();
-    Label labelLeftWGS84_secDec_Lat = new Label(); Label labelLeftWGS84_degDecSec_Lat = new Label();
-    Label labelLeftWGS84_minDecSec_Lat = new Label(); Label labelLeftWGS84_secDecSec_Lat = new Label();
-    Label labelLeftLon = new Label();  Label labelLeftWGS84_degDec_Lon = new Label();
-    Label labelLeftWGS84_minDec_Lon = new Label(); Label labelLeftWGS84_degDecMin_Lon = new Label(); Label labelLeftWGS84_minDecMin_Lon = new Label();
-    Label labelLeftWGS84_secDec_Lon = new Label(); Label labelLeftWGS84_degDecSec_Lon = new Label(); Label labelLeftWGS84_minDecSec_Lon = new Label();
-    Label labelLeftWGS84_secDecSec_Lon = new Label();
+    Label labelLeftWGS84_minDec_Lat = new Label(); Label labelLeftWGS84_degDecMin_Lat = new Label();
+    Label labelLeftWGS84_minDecMin_Lat = new Label(); Label labelLeftWGS84_secDec_Lat = new Label();
+    Label labelLeftWGS84_degDecSec_Lat = new Label(); Label labelLeftWGS84_minDecSec_Lat = new Label();
+    Label labelLeftWGS84_secDecSec_Lat = new Label(); Label labelLeftLon = new Label();
+    Label labelLeftWGS84_degDec_Lon = new Label(); Label labelLeftWGS84_minDec_Lon = new Label();
+    Label labelLeftWGS84_degDecMin_Lon = new Label(); Label labelLeftWGS84_minDecMin_Lon = new Label();
+    Label labelLeftWGS84_secDec_Lon = new Label(); Label labelLeftWGS84_degDecSec_Lon = new Label();
+    Label labelLeftWGS84_minDecSec_Lon = new Label(); Label labelLeftWGS84_secDecSec_Lon = new Label();
     
-    TextField textLeftOSEast = new TextField(); TextField textLeftOSNorth = new TextField(); TextField textLeftOsSixFigure = new TextField();
-    
-    TextField textLeftWGS84_degDec_Lat = new TextField();
+    TextField textLeftOSEast = new TextField(); TextField textLeftOSNorth = new TextField();
+    TextField textLeftOsSixFigure = new TextField(); TextField textLeftWGS84_degDec_Lat = new TextField();
     TextField textLeftWGS84_degDecMin_Lat = new TextField(); TextField textLeftWGS84_minDecMin_Lat = new TextField();
-    TextField textLeftWGS84_degDecSec_Lat = new TextField(); TextField textLeftWGS84_minDecSec_Lat = new TextField(); TextField textLeftWGS84_secDecSec_Lat = new TextField();
+    TextField textLeftWGS84_degDecSec_Lat = new TextField(); TextField textLeftWGS84_minDecSec_Lat = new TextField();
+    TextField textLeftWGS84_secDecSec_Lat = new TextField();
     
-    TextField textLeftWGS84_degDec_Lon = new TextField();   
-    TextField textLeftWGS84_degDecMin_Lon = new TextField(); TextField textLeftWGS84_minDecMin_Lon = new TextField();
-    TextField textLeftWGS84_degDecSec_Lon = new TextField(); TextField textLeftWGS84_minDecSec_Lon = new TextField(); TextField textLeftWGS84_secDecSec_Lon = new TextField(); 
-    
-    
-    Label labelRightOS = new Label(); Label labelRightOSEast = new Label(); Label labelRightOSNorth = new Label(); Label labelRightOsSixFigure = new Label();
+    TextField textLeftWGS84_degDec_Lon = new TextField(); TextField textLeftWGS84_degDecMin_Lon = new TextField();
+    TextField textLeftWGS84_minDecMin_Lon = new TextField(); TextField textLeftWGS84_degDecSec_Lon = new TextField();
+    TextField textLeftWGS84_minDecSec_Lon = new TextField(); TextField textLeftWGS84_secDecSec_Lon = new TextField();
+
+    Label labelRightOS = new Label(); Label labelRightOSEast = new Label();
+    Label labelRightOSNorth = new Label(); Label labelRightOsSixFigure = new Label();
     Label labelRightLat = new Label(); Label labelRightWGS84_degDec_Lat = new Label();
-    Label labelRightWGS84_minDec_Lat = new Label(); Label labelRightWGS84_degDecMin_Lat = new Label(); Label labelRightWGS84_minDecMin_Lat = new Label();
-    Label labelRightWGS84_secDec_Lat = new Label(); Label labelRightWGS84_degDecSec_Lat = new Label();
-    Label labelRightWGS84_minDecSec_Lat = new Label(); Label labelRightWGS84_secDecSec_Lat = new Label();
-    Label labelRightLon = new Label(); Label labelRightWGS84_degDec_Lon = new Label();
-    Label labelRightWGS84_minDec_Lon = new Label(); Label labelRightWGS84_degDecMin_Lon = new Label(); Label labelRightWGS84_minDecMin_Lon = new Label();
+    Label labelRightWGS84_minDec_Lat = new Label(); Label labelRightWGS84_degDecMin_Lat = new Label();
+    Label labelRightWGS84_minDecMin_Lat = new Label(); Label labelRightWGS84_secDec_Lat = new Label();
+    Label labelRightWGS84_degDecSec_Lat = new Label(); Label labelRightWGS84_minDecSec_Lat = new Label();
+    Label labelRightWGS84_secDecSec_Lat = new Label(); Label labelRightLon = new Label();
+    Label labelRightWGS84_degDec_Lon = new Label(); Label labelRightWGS84_minDec_Lon = new Label();
+    Label labelRightWGS84_degDecMin_Lon = new Label(); Label labelRightWGS84_minDecMin_Lon = new Label();
     Label labelRightWGS84_secDec_Lon = new Label(); Label labelRightWGS84_degDecSec_Lon = new Label();
     Label labelRightWGS84_minDecSec_Lon = new Label(); Label labelRightWGS84_secDecSec_Lon = new Label();
     
-    TextField textRightOSEast = new TextField(); TextField textRightOSNorth = new TextField(); TextField textRightOsSixFigure = new TextField();
-    TextField textRightWGS84_degDec_Lat = new TextField();  
+    TextField textRightOSEast = new TextField(); TextField textRightOSNorth = new TextField();
+    TextField textRightOsSixFigure = new TextField(); TextField textRightWGS84_degDec_Lat = new TextField();
     TextField textRightWGS84_degDecMin_Lat = new TextField(); TextField textRightWGS84_minDecMin_Lat = new TextField();
-    TextField textRightWGS84_degDecSec_Lat = new TextField(); TextField textRightWGS84_minDecSec_Lat = new TextField(); TextField textRightWGS84_secDecSec_Lat = new TextField();
-    TextField textRightWGS84_degDec_Lon = new TextField();   
+    TextField textRightWGS84_degDecSec_Lat = new TextField(); TextField textRightWGS84_minDecSec_Lat = new TextField();
+    TextField textRightWGS84_secDecSec_Lat = new TextField(); TextField textRightWGS84_degDec_Lon = new TextField();
     TextField textRightWGS84_degDecMin_Lon = new TextField(); TextField textRightWGS84_minDecMin_Lon = new TextField();
-    TextField textRightWGS84_degDecSec_Lon = new TextField(); TextField textRightWGS84_minDecSec_Lon = new TextField(); TextField textRightWGS84_secDecSec_Lon = new TextField();
-    
-    
+    TextField textRightWGS84_degDecSec_Lon = new TextField(); TextField textRightWGS84_minDecSec_Lon = new TextField();
+    TextField textRightWGS84_secDecSec_Lon = new TextField();
+
     Label lableDistTitle = new Label(); Label labelDistKm = new Label(); Label labelDistMilesStatue = new Label();
     Label labelDistMilesNautical = new Label(); Label labelDistMetres = new Label(); Label labelDistFt = new Label();
     
     TextField textDistKm = new TextField(); TextField textDistMilesStatue = new TextField();
-    TextField textDistMilesNautical = new TextField(); TextField textDistMetres = new TextField(); TextField textDistFt = new TextField();
+    TextField textDistMilesNautical = new TextField(); TextField textDistMetres = new TextField();
+    TextField textDistFt = new TextField();
     
-    Button buttonDistCalculate = new Button(); Button buttonDistConvert = new Button(); Button buttonDistClear = new Button();
-    Button buttonBearingCalculate = new Button(),
-    buttonBearingClear = new Button(); TextField textBearing = new TextField(); TextField textAzimuth = new TextField();
-    Button buttonHelp = new Button();
+    Button buttonDistCalculate = new Button(); Button buttonDistConvert = new Button();
+    Button buttonDistClear = new Button(); Button buttonBearingCalculate = new Button(),
+    buttonBearingClear = new Button(); TextField textBearing = new TextField();
+    TextField textAzimuth = new TextField(); Button buttonHelp = new Button();
     Label labelAzimuth = new Label(); Label labelBearing = new Label();
         
-    Label labelGap00a = new Label(); Label labelGap00b = new Label(); Label labelGap0a = new Label(); Label labelGap0b = new Label();
-    Label labelGap1 = new Label(); Label labelGap2 = new Label(); Label labelGap3 = new Label(); Label labelGap4 = new Label();
-    Label labelGap5 = new Label(); Label labelGap6 = new Label(); Label labelGap7 = new Label(); Label labelGap8 = new Label();
-    Label labelGap9 = new Label(); Label labelGap10 = new Label(); Label labelGap11 = new Label(); Label labelGap12 = new Label();
-    Label labelGap12a = new Label(); Label labelGap13 = new Label(); Label labelGap14 = new Label(); Label labelGap15 = new Label();
-    Label labelGap16 = new Label(); Label labelGap17 = new Label(); Label labelGap18 = new Label(); Label labelGap19 = new Label();
-    Label labelGap20 = new Label(); Label labelGap21 = new Label(); Label labelGap22 = new Label(), labelGap23 = new Label(),
-    labelGap24 = new Label(), labelGap25 = new Label(), labelGap26 = new Label();
-    Label labelGap0aa = new Label(); Label labelGap00aa = new Label(); 
-    Label labelGap0aaa = new Label(); Label labelGap00aaa = new Label();
-    Label labelGap0ba = new Label(); Label labelGap00ba = new Label(); 
-    Label labelGap0baa = new Label(); Label labelGap00baa = new Label(); 
+    Label labelGap00a = new Label(); Label labelGap00b = new Label(); Label labelGap0a = new Label();
+    Label labelGap0b = new Label(); Label labelGap1 = new Label(); Label labelGap2 = new Label();
+    Label labelGap3 = new Label(); Label labelGap4 = new Label(); Label labelGap5 = new Label();
+    Label labelGap6 = new Label(); Label labelGap7 = new Label(); Label labelGap8 = new Label();
+    Label labelGap9 = new Label(); Label labelGap10 = new Label(); Label labelGap11 = new Label();
+    Label labelGap12 = new Label(); Label labelGap12a = new Label(); Label labelGap13 = new Label();
+    Label labelGap14 = new Label(); Label labelGap15 = new Label(); Label labelGap16 = new Label();
+    Label labelGap17 = new Label(); Label labelGap18 = new Label(); Label labelGap19 = new Label();
+    Label labelGap20 = new Label(); Label labelGap21 = new Label(); Label labelGap22 = new Label();
+    Label labelGap23 = new Label(); Label labelGap24 = new Label(); Label labelGap25 = new Label();
+    Label labelGap26 = new Label(); Label labelGap0aa = new Label(); Label labelGap00aa = new Label();
+    Label labelGap0aaa = new Label(); Label labelGap00aaa = new Label(); Label labelGap0ba = new Label();
+    Label labelGap00ba = new Label(); Label labelGap0baa = new Label(); Label labelGap00baa = new Label();
     
     String temp = "";
-    
-    //------------- controls for Area Calculator Tab D----------------
-    
+
+    /*
+     *  Controls declarations for Area & Perimeter Calculator, TabD
+     */
     Button buttonCalcArea, buttonCalcPerim, buttonAddPoint, buttonDelPoint, buttonClearList,
     		buttonExport, buttonImport, buttonSubmitLeft, buttonSubmitRight, buttonHelpTabD,
     		buttonValidatePoint, buttonClearPointText, buttonClearArea, buttonClearPerim;
     
     TextField textCalcAreaMetre2, textCalcAreaFt2, textCalcAreaAcre, textCalcAreaHa,
-    		textCalcPerimMetre, textCalcPerimFt, textCalcPerimKm, textCalcPerimMile, textPointNum, textPointEast, textPointNorth;
-    			
-    
-    Label labelTitleTabD, labelPointSubmittedLeft, labelPointSubmittedRight, labelPointAdded, labelPointDeleted,
-    		labelFt2, labelMetre2, labelAcre, labelHa, labelFt, labelMetre, labelKm, labelMile,
-    		labelNumber, labelEasting, labelNorthing;
+    		textCalcPerimMetre, textCalcPerimFt, textCalcPerimKm, textCalcPerimMile,
+            textPointNum, textPointEast, textPointNorth;
+
+    Label labelTitleTabD, labelPointSubmittedLeft, labelPointSubmittedRight, labelPointAdded,
+            labelPointDeleted, labelFt2, labelMetre2, labelAcre, labelHa, labelFt, labelMetre,
+            labelKm, labelMile,	labelNumber, labelEasting, labelNorthing;
     
     TableView<Vertex> table;
     ComboBox<String> comboImport, comboExport;
     
-    final static String SPACE_SIN_NUMBER = "easting northing (separated with space)";
-    final static String COMMA_SIN_NUMBER = "easting,northing (separated with comma)";
-    final static String SPACE_WITH_NUMBER = "number easting northing (separated with space)";
-    final static String COMMA_WITH_NUMBER = "number,easting,northing (separated with comma)";
-    
-    
-    
-    //+++++++++++++++++++++++++++++++++ Application start() ++++++++++++++++++++++++++++++++++++++++++++++++
+    /*********************************** Application *****************************************/
     
     public static void main(String[] args){
         launch(args);
@@ -195,32 +231,39 @@ public class MapConverterFX extends Application {
     
     @Override
     public void start(Stage primaryStage) throws Exception {
-             
-    	//setting up TabPane
+
+        /*
+         * Setting up TabPane
+         */
         TabPane tabPane = new TabPane();
         BorderPane mainPane = new BorderPane();
-        
-           	
-    	//=============== TabA  ==================================
-        
+
+
+    	/************************************* TabA *************************************/
+
         Tab tabA = new Tab();
         tabA.setText("  Scale Converter  ");
-    	
-        //top pane for title
+
+        /*
+         * Top pane with title
+         */
         Text titleA = new Text("S c a l e    C o n v e r t e r");
         titleA.setFont(Font.font("Arial", FontWeight.NORMAL, 22));
         titleA.setFill(Color.NAVY);
-        
         HBox paneTopA = new HBox(titleA);
         paneTopA.setAlignment(Pos.CENTER);
         paneTopA.setPadding(new Insets(20, 20, 20, 0));
-        
-        //panes for: labels + text field + button + text
-        
-      //formatter for TextFiled input for only 0-9 digits
+
+        /*
+         * Formatter for text input , 0-9 digits only
+         */
         TextFormatter<String> txtScaleFraFormatter = new TextFormatter<>(value -> {
             return value.getText().matches("[0-9]*")? value : null;
         });
+
+        /*
+         * HBox pane with: Label + Text Field + Button and Text - Fractional scale section
+         */
         txtFra1 = new Text(" 1 :");
         txtScaleFra = new TextField();
         txtScaleFra.setMinWidth(155);
@@ -249,9 +292,11 @@ public class MapConverterFX extends Application {
         Region spacer = new Region();
         HBox paneFra = new HBox(10, spacer, lblScaleFra, txtFra1, txtScaleFra, btnConvertFra, resultFra);
         paneFra.setAlignment(Pos.CENTER_LEFT);
-        //paneFra.setHgrow(spacer, Priority.ALWAYS);
         paneFra.setPadding(new Insets(10, 10, 10, 10));
-        
+
+        /*
+         * HBox pane with: Label + Text Field + Button and Text - Imperial1 (inches to the mile) scale section
+         */
         txtScaleImpIn = new TextField();
         txtScaleImpIn.setMinWidth(180);
         txtScaleImpIn.setStyle("-fx-font: 12 arial;");
@@ -276,12 +321,13 @@ public class MapConverterFX extends Application {
         btnConvertIn.setPrefWidth(100);
         btnConvertIn.setPrefHeight(30);
         btnConvertIn.setOnAction(e-> convertIn());
-        //Region spacer = new Region();
         HBox paneIn = new HBox(10, spacer, lblScaleImpIn, txtScaleImpIn, btnConvertIn, resultIn);
         paneIn.setAlignment(Pos.CENTER_LEFT);
-        //paneIn.setHgrow(spacer, Priority.ALWAYS);
         paneIn.setPadding(new Insets(20, 10, 20, 10));
-        
+
+        /*
+         * HBox pane with: Label + Text Field + Button and Text - Imperial2 (miles to an inch) scale section
+         */
         txtScaleImpMile = new TextField();
         txtScaleImpMile.setMinWidth(180);
         txtScaleImpMile.setStyle("-fx-font: 12 arial;");
@@ -308,9 +354,11 @@ public class MapConverterFX extends Application {
         btnConvertMile.setOnAction(e-> convertMile());
         HBox paneMile = new HBox(10, spacer, lblScaleImpMile, txtScaleImpMile, btnConvertMile, resultMile);
         paneMile.setAlignment(Pos.CENTER_LEFT);
-        //paneMile.setHgrow(spacer, Priority.ALWAYS);
         paneMile.setPadding(new Insets(20, 10, 20, 10));
-        
+
+        /*
+         * HBox pane with: Label + Text Field + Button and Text - Metric1 (cm to a km) scale section
+         */
         txtScaleMetricCm = new TextField();
         txtScaleMetricCm.setMinWidth(180);
         txtScaleMetricCm.setStyle("-fx-font: 12 arial;");
@@ -337,9 +385,11 @@ public class MapConverterFX extends Application {
         btnConvertCm.setOnAction(e-> convertCm());
         HBox paneMetre = new HBox(10, spacer, lblScaleMetricCm, txtScaleMetricCm, btnConvertCm, resultCm);
         paneMetre.setAlignment(Pos.CENTER_LEFT);
-        //paneMetre.setHgrow(spacer, Priority.ALWAYS);
         paneMetre.setPadding(new Insets(20, 10, 20, 10));
-         
+
+        /*
+         * HBox pane with: Label + Text Field + Button and Text - Metric2 (km to a cm) scale section
+         */
         txtScaleMetricKm = new TextField();
         txtScaleMetricKm.setMinWidth(180);
         txtScaleMetricKm.setStyle("-fx-font: 12 arial;");
@@ -366,14 +416,17 @@ public class MapConverterFX extends Application {
         btnConvertKm.setOnAction(e-> convertKm());
         HBox paneKm = new HBox(10, spacer, lblScaleMetricKm, txtScaleMetricKm, btnConvertKm, resultKm);
         paneKm.setAlignment(Pos.CENTER_LEFT);
-        //paneKm.setHgrow(spacer, Priority.ALWAYS);
         paneKm.setPadding(new Insets(20, 10, 20, 10));
-        
-        
+
+        /*
+         * Vbox pane with all the HBox panes defined above (fractional, imperial 1 and 2, metric 1 and 2
+         */
         VBox paneCenter = new VBox(10, spacer, paneFra, paneIn, paneMile, paneMetre, paneKm);
         paneCenter.setPadding(new Insets(0, 0, 0, 20));
-        
-        // bottom pane for buttons
+
+        /*
+         * Bottom HBox pane with 'clear' button
+         */
         btnClear = new Button("CLEAR");
         btnClear.setTextFill(Color.RED);
         btnClear.setStyle("-fx-font: 20 arial;");
@@ -381,48 +434,52 @@ public class MapConverterFX extends Application {
         btnClear.setPrefWidth(170);
         btnClear.setPrefHeight(50);
         btnClear.setOnAction(e-> clearFields());
-        
         HBox paneBottom = new HBox(10);
         paneBottom.setAlignment(Pos.BOTTOM_RIGHT);
         paneBottom.getChildren().add(btnClear);
         paneBottom.setPadding(new Insets(0, 20, 10, 20));
-        
-        //-------------- setting layout for Tab A --------------- 
+
+        /*
+         * Setting TabA layout
+         */
         BorderPane tabA_boderPane = new BorderPane();
         tabA_boderPane.setTop(paneTopA);
         tabA_boderPane.setCenter(paneCenter);
         tabA_boderPane.setBottom(paneBottom);
-        
-        tabA.setContent(tabA_boderPane);       
-  
-        
-    	//=============== TabB ==================================
+        tabA.setContent(tabA_boderPane);
+
+
+        /************************************* TabB *************************************/
         
         Tab tabB = new Tab();
         tabB.setText("Distance Calculator");
-        
-              
-        //----- top pane for title -----
+
+        /*
+         * Top pane with title
+         */
         Text titleB = new Text("  D i s t a n c e   C a l c u l a t o r  ");
         titleB.setFont(Font.font("Arial", FontWeight.NORMAL, 22));
         titleB.setFill(Color.NAVY);
         HBox paneTopB = new HBox(titleB);
         paneTopB.setAlignment(Pos.CENTER);
         paneTopB.setPadding(new Insets(20, 20, 30, 0));
-        
-        //----- centre pane for map distance controls ------
-        
-        //vbox map distance controls
-        
+
+        /*
+         * Formatter for text input , 0-9 digits only
+         */
+        TextFormatter<String> txtMmFraFormatter = new TextFormatter<>(value -> {
+            return value.getText().matches("[0-9]*")? value : null;
+        });
+
+        /*
+         * Vbox pane with everything for map distance measurements
+         */
         Label lblMap = new Label("Map measurement");
         lblMap.setStyle("-fx-font: 16 arial");
         lblMap.setPadding(new Insets(0, 0, 0, 35));
         HBox hboxTitle1 = new HBox(lblMap);
         hboxTitle1.setPadding(new Insets(0, 0, 10, 0));
-        
-        TextFormatter<String> txtMmFraFormatter = new TextFormatter<>(value -> {
-            return value.getText().matches("[0-9]*")? value : null;
-        });
+
         lblMm = new Label("Map measurement in milimetres:");
         lblMm.setMinWidth(210);
         lblMm.setStyle("-fx-font: 13 arial;");
@@ -433,9 +490,6 @@ public class MapConverterFX extends Application {
         txtMm.setOnKeyPressed(new EventHandler<KeyEvent>(){
         	@Override
         	public void handle(KeyEvent event){
-        		//if(event.getCode().equals(KeyCode.ENTER)){
-        		//
-        		//}
         		txtCm.clear();
         		txtIn.clear();
         	}
@@ -452,15 +506,11 @@ public class MapConverterFX extends Application {
         txtCm.setOnKeyPressed(new EventHandler<KeyEvent>(){
         	@Override
         	public void handle(KeyEvent event){
-        		//if(event.getCode().equals(KeyCode.ENTER)){
-        		//	
-        		//}
         		txtMm.clear();
         		txtIn.clear();
         	}
         });
-        
-        
+
         lblIn = new Label("Map measurement in inches:");
         lblIn.setMinWidth(210);
         lblIn.setStyle("-fx-font: 13 arial;");
@@ -472,9 +522,6 @@ public class MapConverterFX extends Application {
         txtIn.setOnKeyPressed(new EventHandler<KeyEvent>(){
         	@Override
         	public void handle(KeyEvent event){
-        		//if(event.getCode().equals(KeyCode.ENTER)){
-        		//	
-        		//}
         		txtMm.clear();
         		txtCm.clear();
         	}
@@ -484,10 +531,11 @@ public class MapConverterFX extends Application {
         vboxMap.setPadding(new Insets(0, 20, 0, 20));
         vboxMap.setSpacing(5);
         vboxMap.getChildren().addAll(hboxTitle1, lblMm, txtMm, lblGap1a, lblCm, txtCm, lblGap1b, lblIn, txtIn);
-        
-        
-        //vbox ground distance controls
-        
+
+
+        /*
+         * Vbox pane with everything for ground distance measurements
+         */
         Label lblGround = new Label("Ground distance");
         lblGround.setStyle("-fx-font: 16 arial");
         lblGround.setPadding(new Insets(0, 0, 0, 45));
@@ -505,16 +553,12 @@ public class MapConverterFX extends Application {
         txtKm.setOnKeyPressed(new EventHandler<KeyEvent>(){
         	@Override
         	public void handle(KeyEvent event){
-        		//if(event.getCode().equals(KeyCode.ENTER)){
-        		//	
-        		//}
         		txtMetre.clear();
     			txtMile.clear();
     			txtFt.clear();
     			txtYard.clear();
         	}
         });
-        
         
         lblMetre = new Label("Ground distance in metres:");
         lblMetre.setMinWidth(210);
@@ -527,17 +571,13 @@ public class MapConverterFX extends Application {
         txtMetre.setOnKeyPressed(new EventHandler<KeyEvent>(){
         	@Override
         	public void handle(KeyEvent event){
-        		//if(event.getCode().equals(KeyCode.ENTER)){
-        		//	
-        		//}
         		txtKm.clear();
     			txtMile.clear();
     			txtFt.clear();
     			txtYard.clear();
         	}
         });
-        
-        
+
         lblMile = new Label("Ground distance in miles:");
         lblMile.setMinWidth(210);
         lblMile.setStyle("-fx-font: 13 arial;");
@@ -549,17 +589,13 @@ public class MapConverterFX extends Application {
         txtMile.setOnKeyPressed(new EventHandler<KeyEvent>(){
         	@Override
         	public void handle(KeyEvent event){
-        		//if(event.getCode().equals(KeyCode.ENTER)){
-        		//	
-        		//}
         		txtMetre.clear();
     			txtKm.clear();
     			txtFt.clear();
     			txtYard.clear();
         	}
         });
-        
-        
+
         lblFt = new Label("Ground distance in feet:");
         lblFt.setMinWidth(210);
         lblFt.setStyle("-fx-font: 13 arial;");
@@ -571,17 +607,13 @@ public class MapConverterFX extends Application {
         txtFt.setOnKeyPressed(new EventHandler<KeyEvent>(){
         	@Override
         	public void handle(KeyEvent event){
-        		//if(event.getCode().equals(KeyCode.ENTER)){
-        		//	
-        		//}
         		txtMetre.clear();
     			txtMile.clear();
     			txtKm.clear();
     			txtYard.clear();
         	}
         });
-        
-        
+
         lblYard = new Label("Ground distance in yards:");
         lblYard.setMinWidth(210);
         lblYard.setStyle("-fx-font: 13 arial;");
@@ -593,43 +625,35 @@ public class MapConverterFX extends Application {
         txtYard.setOnKeyPressed(new EventHandler<KeyEvent>(){
         	@Override
         	public void handle(KeyEvent event){
-        		//if(event.getCode().equals(KeyCode.ENTER)){
-        		//	
-        		//}
         		txtMetre.clear();
     			txtMile.clear();
     			txtFt.clear();
     			txtKm.clear();
         	}
         });
-        
-                
+
         VBox vboxGround = new VBox();
         vboxGround.setPadding(new Insets(0, 20, 0, 20));
         vboxGround.setSpacing(5);
         vboxGround.getChildren().addAll(hboxTitle2, lblKm, txtKm, lblGap2a, lblMetre, txtMetre, lblGap2b, lblMile, txtMile, 
         								lblGap2c, lblFt, txtFt, lblGap2d, lblYard, txtYard);
-        
-        
-        //vbox scale distance controls
-        
+
+
+        /*
+         * Vbox pane with everything for scale calculations
+         */
         Label lblScale = new Label("Map scale");
         lblScale.setStyle("-fx-font: 16 arial");
         lblScale.setPadding(new Insets(0, 0, 0, 45));
         HBox hboxTitle3 = new HBox(lblScale);
         hboxTitle3.setPadding(new Insets(0, 0, 10, 0));
-        
-        
-        //TextFormatter<String> txtScaleFractionalFormatter = new TextFormatter<>(value -> {
-        //    return value.getText().matches("([0-9]*\\)*\\(*\\s*)*")? value : null; //  "[0-9]*"
-        //});
+
         lblScaleFractional = new Label("Fractional e.g. 1:10,000");
         lblScaleFractional.setMinWidth(210);
         lblScaleFractional.setStyle("-fx-font: 13 arial;");
         txtScaleFractional = new TextField();
         txtScaleFractional.setMinWidth(190);
         txtScaleFractional.setPromptText("Enter denominator (eg.10000)");
-        //txtScaleFractional.setTextFormatter(txtScaleFractionalFormatter);
         txtScaleFractional.textProperty().addListener(
                 (obs, oldVal, newVal) -> txtScaleFractional.setText(newVal.replaceAll("[^\\d\\,\\d]", "")));
         txtScaleFractional.setOnKeyPressed(new EventHandler<KeyEvent>(){
@@ -658,9 +682,6 @@ public class MapConverterFX extends Application {
         txtScaleInch.setOnKeyPressed(new EventHandler<KeyEvent>(){
         	@Override
         	public void handle(KeyEvent event){
-        		//if(event.getCode().equals(KeyCode.ENTER)){
-        		//	
-        		//}
         		txtScaleFractional.clear();
     			txtScaleMile.clear();
     			txtScaleCm.clear();
@@ -672,8 +693,7 @@ public class MapConverterFX extends Application {
         lbltxtInch.setStyle("-fx-text-fill: grey;");
         HBox hboxInch = new HBox(txtScaleInch, lbltxtInch);
         hboxInch.setAlignment(Pos.CENTER_LEFT);
-        
-        
+
         lblScaleMile = new Label("Miles to an inch (Imperial):");
         lblScaleMile.setMinWidth(210);
         lblScaleMile.setStyle("-fx-font: 13 arial;");
@@ -686,9 +706,6 @@ public class MapConverterFX extends Application {
         txtScaleMile.setOnKeyPressed(new EventHandler<KeyEvent>(){
         	@Override
         	public void handle(KeyEvent event){
-        		//if(event.getCode().equals(KeyCode.ENTER)){
-        		//	
-        		//}
         		txtScaleInch.clear();
     			txtScaleFractional.clear();
     			txtScaleCm.clear();
@@ -700,8 +717,7 @@ public class MapConverterFX extends Application {
         lbltxtMile.setStyle("-fx-text-fill: grey;");
         HBox hboxMile = new HBox(txtScaleMile, lbltxtMile);
         hboxMile.setAlignment(Pos.CENTER_LEFT);
-        
-        
+
         lblScaleCm = new Label("Centimetres to a kilometre (Metric):");
         lblScaleCm.setMinWidth(210);
         lblScaleCm.setStyle("-fx-font: 13 arial;");
@@ -714,9 +730,6 @@ public class MapConverterFX extends Application {
         txtScaleCm.setOnKeyPressed(new EventHandler<KeyEvent>(){
         	@Override
         	public void handle(KeyEvent event){
-        		//if(event.getCode().equals(KeyCode.ENTER)){
-        		//	
-        		//}
         		txtScaleInch.clear();
     			txtScaleMile.clear();
     			txtScaleFractional.clear();
@@ -728,7 +741,6 @@ public class MapConverterFX extends Application {
         lbltxtCm.setStyle("-fx-text-fill: grey;");
         HBox hboxCm = new HBox(txtScaleCm, lbltxtCm);
         hboxCm.setAlignment(Pos.CENTER_LEFT);
-        
         
         lblScaleKm = new Label("Kilometres to a centimetre (Metric):");
         lblScaleKm.setMinWidth(210);
@@ -742,9 +754,6 @@ public class MapConverterFX extends Application {
         txtScaleKm.setOnKeyPressed(new EventHandler<KeyEvent>(){
         	@Override
         	public void handle(KeyEvent event){
-        		//if(event.getCode().equals(KeyCode.ENTER)){
-        		//	
-        		//}
         		txtScaleInch.clear();
     			txtScaleMile.clear();
     			txtScaleCm.clear();
@@ -757,15 +766,15 @@ public class MapConverterFX extends Application {
         HBox hboxKm = new HBox(txtScaleKm, lbltxtKm);
         hboxKm.setAlignment(Pos.CENTER_LEFT);
         
-        
         VBox vboxScale = new VBox();
         vboxScale.setPadding(new Insets(0, 20, 0, 20));
         vboxScale.setSpacing(5);
         vboxScale.getChildren().addAll(hboxTitle3, lblScaleFractional, hboxFractional, lblGap3a, lblScaleInch, hboxInch, lblGap3b, lblScaleMile, hboxMile, 
         								lblGap3c, lblScaleCm, hboxCm, lblGap3d, lblScaleKm, hboxKm, lblGap3e);
-        
-        //-------------- setting layout for Tab B  ---------------
-        
+
+        /*
+         * Setting ''Help', Calculate' and 'Clear' buttons
+         */
         Button btnCalculate = new Button();
         Label lblCalculate = new Label("CALCULATE");
         lblCalculate.setTextFill(Color.NAVY);
@@ -780,12 +789,10 @@ public class MapConverterFX extends Application {
         		calculate();
         	}
         });
-        
-                
+
         Button btnClear = new Button();
         Label lblClear = new Label("CLEAR");
         lblClear.setTextFill(Color.RED);
-        //btnClear.setStyle("-fx-background-color: lightsalmon;");
         lblClear.setStyle("-fx-font: 20 arial;");
         lblClear.setRotate(-90);
         btnClear.setGraphic(new Group(lblClear));
@@ -806,15 +813,14 @@ public class MapConverterFX extends Application {
         buttonHelpTabB.setOnAction
         				(e -> ImageBoxSingle.show("Help for Distance Calculator", "Help", IMAGE_TAB_B1));
 
-        
-        
-        Text textBottomB1 = new Text("Please fill in ONE field in TWO out of the three columns - the third column will be calcutated");
-        //Text textBottomB2 = new Text("Then press CLALCULATE - fields in the third column will be calculated as well as all the other fields");
+        /*
+         * Setting TabB layout
+         */
+        Text textBottomB1 = new Text("Please fill in ONE field in TWO out of the three columns" +
+                " - the third column will be calcutated");
         textBottomB1.setFill(Color.STEELBLUE);
         textBottomB1.setFont(Font.font("Arial", FontWeight.NORMAL, 14));
-        //textBottomB2.setFill(Color.STEELBLUE);
-        //textBottomB2.setFont(Font.font("Arial", FontWeight.NORMAL, 13));
-        HBox vboxBottomB = new HBox(textBottomB1, labelGapHelp, buttonHelpTabB/*, textBottomB2*/);
+        HBox vboxBottomB = new HBox(textBottomB1, labelGapHelp, buttonHelpTabB);
         vboxBottomB.setAlignment(Pos.BOTTOM_RIGHT);
         vboxBottomB.setPadding(new Insets(0, 35, 20, 20));
         
@@ -827,29 +833,29 @@ public class MapConverterFX extends Application {
         tabB_borderPane.setTop(paneTopB);
         tabB_borderPane.setCenter(hboxB);
         tabB_borderPane.setBottom(vboxBottomB);
-        //tabB_borderPane.setAlignment(vboxBottomB, Pos.TOP_CENTER);
-        
         tabB.setContent(tabB_borderPane);
-        
-        
-        //=============== Tab C =================================================
+
+
+        /************************************* TabC *************************************/
         
         Tab tabC = new Tab();
         tabC.setText("Coordinate Converter");
-        
-              
-        //----- top pane for title -----
+
+
+        /*
+         * Top pane title
+         */
         Text titleC = new Text("  C o o r d i n a t e    C o n v e r t e r  ");
         titleC.setFont(Font.font("Arial", FontWeight.NORMAL, 22));
         titleC.setFill(Color.NAVY);
         HBox paneTopC = new HBox(titleC);
         paneTopC.setAlignment(Pos.CENTER);
         paneTopC.setPadding(new Insets(20, 20, 10, 0));
-        
-        //------------------ centre pane  ---------------------------------
-        
-        //-------------------- LEFT POINT ---------------------------------
-        
+
+
+        /*
+         * ******************** Left Point section
+         */
         labelLeftPoint.setText("LEFT POINT");
         labelLeftPoint.setStyle("-fx-font: 13 arial; -fx-text-fill: grey;");
         
@@ -875,8 +881,7 @@ public class MapConverterFX extends Application {
         textLeftOSEast.setMaxWidth(140);
         textLeftOSNorth.setPromptText("Northing (6 digits)");
         textLeftOSNorth.setMaxWidth(140);
-        
-        
+
         labelLeftLat.setText("Latitude");
         labelLeftLat.setMinWidth(120);
         labelLeftLat.setAlignment(Pos.BASELINE_RIGHT);
@@ -902,7 +907,6 @@ public class MapConverterFX extends Application {
         textLeftWGS84_degDecSec_Lon.setPromptText("Degrees");
         textLeftWGS84_minDecSec_Lon.setPromptText("Minutes");
         textLeftWGS84_secDecSec_Lon.setPromptText("Seconds");
-        
                 
         buttonLeftPointConvert.setText("CONVERT / SUBMIT");
         buttonLeftPointConvert.setMinWidth(150);
@@ -912,9 +916,106 @@ public class MapConverterFX extends Application {
         buttonLeftPointClear.setMinWidth(150);
         buttonLeftPointClear.setMaxHeight(50);
         buttonLeftPointClear.setStyle("-fx-text-fill: darkred;");
-        
-        //--------------------- RIGHT POINT ---------------------------------
-                
+
+        /*
+         * Degree, Minute and Second symbols for Left Point
+         */
+        labelLeftWGS84_degDec_Lat.setText("\u00b0"); // degrees
+        labelLeftWGS84_degDec_Lat.setStyle("-fx-font: 15 arial; -fx-text-fill: black;");
+
+        labelLeftWGS84_degDecMin_Lat.setText("\u00b0 ");
+        labelLeftWGS84_degDecMin_Lat.setStyle("-fx-font: 15 arial; -fx-text-fill: black;");
+        labelLeftWGS84_degDecMin_Lat.setMinWidth(77);
+        labelLeftWGS84_minDecMin_Lat.setText("\u2019 "); // minutes
+        labelLeftWGS84_minDecMin_Lat.setStyle("-fx-font: 15 arial; -fx-text-fill: black;");
+
+        labelLeftWGS84_degDecSec_Lat.setText("\u00b0 ");
+        labelLeftWGS84_degDecSec_Lat.setStyle("-fx-font: 15 arial; -fx-text-fill: black;");
+        labelLeftWGS84_degDecSec_Lat.setMinWidth(65);
+        labelLeftWGS84_minDecSec_Lat.setText("\u2019 ");
+        labelLeftWGS84_minDecSec_Lat.setStyle("-fx-font: 15 arial; -fx-text-fill: black;");
+        labelLeftWGS84_minDecSec_Lat.setMinWidth(65);
+        labelLeftWGS84_secDecSec_Lat.setText("\u201D  "); // seconds
+        labelLeftWGS84_secDecSec_Lat.setStyle("-fx-font: 15 arial; -fx-text-fill: black;");
+
+
+        labelLeftWGS84_degDec_Lon.setText("\u00b0");
+        labelLeftWGS84_degDec_Lon.setStyle("-fx-font: 15 arial; -fx-text-fill: black;");
+
+        labelLeftWGS84_degDecMin_Lon.setText("\u00b0");
+        labelLeftWGS84_degDecMin_Lon.setStyle("-fx-font: 15 arial; -fx-text-fill: black;");
+        labelLeftWGS84_degDecMin_Lon.setMinWidth(75);
+        labelLeftWGS84_minDecMin_Lon.setText("\u2019 "); // minutes
+        labelLeftWGS84_minDecMin_Lon.setStyle("-fx-font: 15 arial; -fx-text-fill: black;");
+
+        labelLeftWGS84_degDecSec_Lon.setText("\u00b0 ");
+        labelLeftWGS84_degDecSec_Lon.setStyle("-fx-font: 15 arial; -fx-text-fill: black;");
+        labelLeftWGS84_degDecSec_Lon.setMinWidth(65);
+        labelLeftWGS84_minDecSec_Lon.setText("\u2019 ");
+        labelLeftWGS84_minDecSec_Lon.setStyle("-fx-font: 15 arial; -fx-text-fill: black;");
+        labelLeftWGS84_minDecSec_Lon.setMinWidth(65);
+        labelLeftWGS84_secDecSec_Lon.setText("\u201D  "); // seconds
+        labelLeftWGS84_secDecSec_Lon.setStyle("-fx-font: 15 arial; -fx-text-fill: black;");
+
+        /*
+         * Setting  Left Point layout
+         */
+        BorderPane tabC_borderPane = new BorderPane();
+
+        HBox leftOSPane = new HBox(labelLeftOS);
+        leftOSPane.setAlignment(Pos.CENTER);
+        leftOSPane.setPadding(new Insets(0, 0, 5, 0));
+        HBox leftOSPane_lbl = new HBox(labelLeftOSEast,labelGap0aa, labelLeftOsSixFigure, labelGap0a,
+                labelLeftOSNorth, labelGap0aaa);
+        HBox leftOSPane_txt = new HBox(textLeftOSEast, labelGap0ba, textLeftOsSixFigure, labelGap0b,
+                textLeftOSNorth, labelGap0baa);
+        VBox leftOSPane_all = new VBox(leftOSPane, leftOSPane_lbl, leftOSPane_txt);
+        leftOSPane_all.setPadding(new Insets(0, 0, 20, 0));
+        leftOSPane_all.setAlignment(Pos.CENTER);
+
+        VBox leftWGS84_degDecimalPane_Lat = new VBox(labelLeftLat, labelLeftWGS84_degDec_Lat,
+                textLeftWGS84_degDec_Lat);
+        HBox leftWGS84_minDecimalPane_lbl_Lat = new HBox(labelLeftWGS84_degDecMin_Lat,
+                labelLeftWGS84_minDecMin_Lat);
+        HBox leftWGS84_minDecimalPane_txt_Lat = new HBox(textLeftWGS84_degDecMin_Lat,
+                labelGap5,textLeftWGS84_minDecMin_Lat);
+        HBox leftWGS84_secDecimalPane_lbl_Lat = new HBox(labelLeftWGS84_degDecSec_Lat,
+                labelLeftWGS84_minDecSec_Lat, labelLeftWGS84_secDecSec_Lat);
+        HBox leftWGS84_secDecimalPane_txt_Lat = new HBox(textLeftWGS84_degDecSec_Lat, labelGap6,
+                textLeftWGS84_minDecSec_Lat, labelGap7, textLeftWGS84_secDecSec_Lat);
+
+        VBox leftWGS84_degDecimalPane_Lon = new VBox(labelLeftLon, labelLeftWGS84_degDec_Lon,
+                textLeftWGS84_degDec_Lon);
+        HBox leftWGS84_minDecimalPane_lbl_Lon = new HBox(labelLeftWGS84_degDecMin_Lon,
+                labelLeftWGS84_minDecMin_Lon);
+        HBox leftWGS84_minDecimalPane_txt_Lon = new HBox(textLeftWGS84_degDecMin_Lon, labelGap8,
+                textLeftWGS84_minDecMin_Lon);
+        HBox leftWGS84_secDecimalPane_lbl_Lon = new HBox(labelLeftWGS84_degDecSec_Lon,
+                labelLeftWGS84_minDecSec_Lon, labelLeftWGS84_secDecSec_Lon);
+        HBox leftWGS84_secDecimalPane_txt_Lon = new HBox(textLeftWGS84_degDecSec_Lon,
+                labelGap9, textLeftWGS84_minDecSec_Lon, labelGap10, textLeftWGS84_secDecSec_Lon);
+
+        VBox leftPointPane_Lat = new VBox(leftWGS84_degDecimalPane_Lat, labelLeftWGS84_minDec_Lat,
+                leftWGS84_minDecimalPane_lbl_Lat, leftWGS84_minDecimalPane_txt_Lat, labelLeftWGS84_secDec_Lat,
+                leftWGS84_secDecimalPane_lbl_Lat, leftWGS84_secDecimalPane_txt_Lat);
+        leftPointPane_Lat.setPadding(new Insets(0, 15, 8, 0));
+        VBox leftPointPane_Lon = new VBox(leftWGS84_degDecimalPane_Lon, labelLeftWGS84_minDec_Lon,
+                leftWGS84_minDecimalPane_lbl_Lon, leftWGS84_minDecimalPane_txt_Lon, labelLeftWGS84_secDec_Lon,
+                leftWGS84_secDecimalPane_lbl_Lon, leftWGS84_secDecimalPane_txt_Lon);
+        leftPointPane_Lon.setPadding(new Insets(0, 15, 8, 0));
+        HBox leftPointPane_LatLong = new HBox(leftPointPane_Lon, leftPointPane_Lat);
+
+        HBox buttonLeftPointPane = new HBox(buttonLeftPointConvert, labelGap13, buttonLeftPointClear);
+        buttonLeftPointPane.setAlignment(Pos.CENTER);
+        HBox labelLeftPointPane = new HBox(labelLeftPoint);
+        labelLeftPointPane.setAlignment(Pos.BASELINE_LEFT);
+        VBox coordsLeftPane = new VBox(labelLeftPointPane, leftOSPane_all, leftPointPane_LatLong, buttonLeftPointPane);
+        coordsLeftPane.setPadding(new Insets(0, 10, 0, 0));
+        coordsLeftPane.setAlignment(Pos.CENTER);
+
+        /*
+         * ******************** Right Point section
+         */
         labelRightPoint.setText("RIGHT POINT");
         labelRightPoint.setStyle("-fx-font: 13 arial; -fx-text-fill: grey;");
         
@@ -929,8 +1030,7 @@ public class MapConverterFX extends Application {
         labelGap00a.setMinWidth(5); labelGap00b.setMinWidth(10);
         labelGap00aa.setMinWidth(10); labelGap00ba.setMinWidth(10);
         labelGap00aaa.setMinWidth(5); labelGap00baa.setMinWidth(15);
-        
-      
+
         labelRightOSEast.setText("Easting ");
         labelRightOSEast.setMinWidth(140);
         labelRightOSEast.setStyle("-fx-font: 11 arial; -fx-text-fill: grey;");
@@ -941,8 +1041,7 @@ public class MapConverterFX extends Application {
         textRightOSEast.setMaxWidth(1140);
         textRightOSNorth.setPromptText("Northing (6 digits)");
         textRightOSNorth.setMaxWidth(1140);
-        
-        
+
         labelRightLat.setText("Latitude");
         labelRightLat.setMinWidth(120);
         labelRightLat.setAlignment(Pos.BASELINE_RIGHT);
@@ -955,7 +1054,6 @@ public class MapConverterFX extends Application {
         textRightWGS84_degDecSec_Lat.setPromptText("Degrees");
         textRightWGS84_minDecSec_Lat.setPromptText("Minutes");
         textRightWGS84_secDecSec_Lat.setPromptText("Seconds");
-        
         
         labelRightLon.setText("Longitude");
         labelRightLon.setMinWidth(120);
@@ -970,7 +1068,6 @@ public class MapConverterFX extends Application {
         textRightWGS84_minDecSec_Lon.setPromptText("Minutes");
         textRightWGS84_secDecSec_Lon.setPromptText("Seconds");
         
-        
         buttonRightPointConvert.setText("CONVERT / SUBMIT");
         buttonRightPointConvert.setMinWidth(150);
         buttonRightPointConvert.setMaxHeight(50);
@@ -979,10 +1076,109 @@ public class MapConverterFX extends Application {
         buttonRightPointClear.setMinWidth(150);
         buttonRightPointClear.setMaxHeight(50);
         buttonRightPointClear.setStyle("-fx-text-fill: darkred;");
-        
-        
-        //-------------------- DISTANCE & BEARING----------------------------
-        
+
+        /*
+         * Degree, Minute and Second symbols for Right Point
+         */
+        labelRightWGS84_degDec_Lat.setText("\u00b0"); // degrees
+        labelRightWGS84_degDec_Lat.setStyle("-fx-font: 15 arial; -fx-text-fill: black;");
+
+        labelRightWGS84_degDecMin_Lat.setText("\u00b0 ");
+        labelRightWGS84_degDecMin_Lat.setStyle("-fx-font: 15 arial; -fx-text-fill: black;");
+        labelRightWGS84_degDecMin_Lat.setMinWidth(77);
+        labelRightWGS84_minDecMin_Lat.setText("\u2019 "); // minutes
+        labelRightWGS84_minDecMin_Lat.setStyle("-fx-font: 15 arial; -fx-text-fill: black;");
+
+        labelRightWGS84_degDecSec_Lat.setText("\u00b0 ");
+        labelRightWGS84_degDecSec_Lat.setStyle("-fx-font: 15 arial; -fx-text-fill: black;");
+        labelRightWGS84_degDecSec_Lat.setMinWidth(65);
+        labelRightWGS84_minDecSec_Lat.setText("\u2019 ");
+        labelRightWGS84_minDecSec_Lat.setStyle("-fx-font: 15 arial; -fx-text-fill: black;");
+        labelRightWGS84_minDecSec_Lat.setMinWidth(65);
+        labelRightWGS84_secDecSec_Lat.setText("\u201D  "); // seconds
+        labelRightWGS84_secDecSec_Lat.setStyle("-fx-font: 15 arial; -fx-text-fill: black;");
+
+
+        labelRightWGS84_degDec_Lon.setText("\u00b0");
+        labelLeftWGS84_degDec_Lon.setStyle("-fx-font: 15 arial; -fx-text-fill: black;");
+
+        labelRightWGS84_degDecMin_Lon.setText("\u00b0");
+        labelRightWGS84_degDecMin_Lon.setStyle("-fx-font: 15 arial; -fx-text-fill: black;");
+        labelRightWGS84_degDecMin_Lon.setMinWidth(75);
+        labelRightWGS84_minDecMin_Lon.setText("\u2019 "); // minutes
+        labelRightWGS84_minDecMin_Lon.setStyle("-fx-font: 15 arial; -fx-text-fill: black;");
+
+        labelRightWGS84_degDecSec_Lon.setText("\u00b0 ");
+        labelRightWGS84_degDecSec_Lon.setStyle("-fx-font: 15 arial; -fx-text-fill: black;");
+        labelRightWGS84_degDecSec_Lon.setMinWidth(65);
+        labelRightWGS84_minDecSec_Lon.setText("\u2019 ");
+        labelRightWGS84_minDecSec_Lon.setStyle("-fx-font: 15 arial; -fx-text-fill: black;");
+        labelRightWGS84_minDecSec_Lon.setMinWidth(65);
+        labelRightWGS84_secDecSec_Lon.setText("\u201D  "); // seconds
+        labelRightWGS84_secDecSec_Lon.setStyle("-fx-font: 15 arial; -fx-text-fill: black;");
+
+        /*
+         * Setting  Right Point layout
+         */
+        HBox rightOSPane = new HBox(labelRightOS);
+        rightOSPane.setAlignment(Pos.CENTER);
+        rightOSPane.setPadding(new Insets(0, 0, 5, 0));
+        HBox rightOSPane_lbl = new HBox(labelRightOSEast,labelGap00aa, labelRightOsSixFigure,
+                labelGap00a, labelRightOSNorth, labelGap00aaa);
+        HBox rightOSPane_txt = new HBox(textRightOSEast, labelGap00ba, textRightOsSixFigure,
+                labelGap00b, textRightOSNorth, labelGap00baa);
+        VBox rightOSPane_all = new VBox(rightOSPane, rightOSPane_lbl, rightOSPane_txt);
+        rightOSPane_all.setPadding(new Insets(0, 0, 20, 0));
+        rightOSPane_all.setAlignment(Pos.CENTER);
+
+        VBox rightWGS84_degDecimalPane_Lat = new VBox(labelRightLat, labelRightWGS84_degDec_Lat,
+                textRightWGS84_degDec_Lat);
+        HBox rightWGS84_minDecimalPane_lbl_Lat = new HBox(labelRightWGS84_degDecMin_Lat,
+                labelRightWGS84_minDecMin_Lat);
+        HBox rightWGS84_minDecimalPane_txt_Lat = new HBox(textRightWGS84_degDecMin_Lat, labelGap14,
+                textRightWGS84_minDecMin_Lat);
+        HBox rightWGS84_secDecimalPane_lbl_Lat = new HBox(labelRightWGS84_degDecSec_Lat,
+                labelRightWGS84_minDecSec_Lat, labelRightWGS84_secDecSec_Lat);
+        HBox rightWGS84_secDecimalPane_txt_Lat = new HBox(textRightWGS84_degDecSec_Lat, labelGap15,
+                textRightWGS84_minDecSec_Lat, labelGap16, textRightWGS84_secDecSec_Lat);
+
+        VBox rightWGS84_degDecimalPane_Lon = new VBox(labelRightLon, labelRightWGS84_degDec_Lon,
+                textRightWGS84_degDec_Lon);
+        HBox rightWGS84_minDecimalPane_lbl_Lon = new HBox(labelRightWGS84_degDecMin_Lon,
+                labelRightWGS84_minDecMin_Lon);
+        HBox rightWGS84_minDecimalPane_txt_Lon = new HBox(textRightWGS84_degDecMin_Lon, labelGap17,
+                textRightWGS84_minDecMin_Lon);
+        HBox rightWGS84_secDecimalPane_lbl_Lon = new HBox(labelRightWGS84_degDecSec_Lon,
+                labelRightWGS84_minDecSec_Lon, labelRightWGS84_secDecSec_Lon);
+        HBox rightWGS84_secDecimalPane_txt_Lon = new HBox(textRightWGS84_degDecSec_Lon,
+                labelGap18, textRightWGS84_minDecSec_Lon, labelGap19, textRightWGS84_secDecSec_Lon);
+
+        VBox rightPointPane_Lat = new VBox(rightWGS84_degDecimalPane_Lat, labelRightWGS84_minDec_Lat,
+                rightWGS84_minDecimalPane_lbl_Lat, rightWGS84_minDecimalPane_txt_Lat, labelRightWGS84_secDec_Lat,
+                rightWGS84_secDecimalPane_lbl_Lat, rightWGS84_secDecimalPane_txt_Lat);
+        rightPointPane_Lat.setPadding(new Insets(0, 15, 8, 0));
+        VBox rightPointPane_Lon = new VBox(rightWGS84_degDecimalPane_Lon, labelRightWGS84_minDec_Lon,
+                rightWGS84_minDecimalPane_lbl_Lon, rightWGS84_minDecimalPane_txt_Lon, labelRightWGS84_secDec_Lon,
+                rightWGS84_secDecimalPane_lbl_Lon, rightWGS84_secDecimalPane_txt_Lon);
+        rightPointPane_Lon.setPadding(new Insets(0, 15, 8, 0));
+        HBox rightPointPane_LatLong = new HBox(rightPointPane_Lon, rightPointPane_Lat);
+
+        HBox buttonRightPointPane = new HBox(buttonRightPointConvert, labelGap20, buttonRightPointClear);
+        buttonRightPointPane.setAlignment(Pos.CENTER);
+        HBox labelRightPointPane = new HBox(labelRightPoint);
+        labelRightPointPane.setAlignment(Pos.BASELINE_LEFT);
+        VBox coordsRightPane = new VBox(labelRightPointPane, rightOSPane_all,rightPointPane_LatLong, buttonRightPointPane);
+        coordsRightPane.setPadding(new Insets(0, 0, 0, 10));
+        coordsRightPane.setAlignment(Pos.CENTER);
+
+        /*
+         * Putting together Left and Right Points sections
+         */
+        HBox coordsPane = new HBox(coordsLeftPane, coordsRightPane);
+
+        /*
+         * ******************** Distance and Bearing section
+         */
         lableDistTitle.setText("D I S T A N C E   &   B E A R I N G");
         lableDistTitle.setStyle("-fx-font: 15 arial;");
         lableDistTitle.setMinWidth(450);
@@ -1015,14 +1211,12 @@ public class MapConverterFX extends Application {
         textDistMilesNautical.setPromptText("nautical miles");
         textDistMetres.setPromptText("metres");
         textDistFt.setPromptText("feet");
-        
-        
+
         buttonDistCalculate.setText("CALCULATE (between points)");
         buttonDistCalculate.setStyle("-fx-text-fill: darkblue;");
         buttonDistCalculate.setMaxHeight(40);
         buttonDistCalculate.setPrefWidth(300); 
 
-        
         buttonDistConvert.setText("CONVERT (between units)");
         buttonDistConvert.setStyle("-fx-text-fill: navy;");
         buttonDistConvert.setMaxHeight(40);
@@ -1063,7 +1257,6 @@ public class MapConverterFX extends Application {
         buttonHelp.setStyle("-fx-text-fill: DarkGoldenRod;");
         buttonHelp.setMaxHeight(40);
         buttonHelp.setMinWidth(70);
-        
        
         labelGap1.setMinWidth(20); labelGap2.setMinWidth(20); labelGap3.setMinWidth(20); labelGap4.setMinWidth(20);
         labelGap5.setMinWidth(7); labelGap6.setMinWidth(7); labelGap7.setMinWidth(7); labelGap8.setMinWidth(7);
@@ -1082,182 +1275,34 @@ public class MapConverterFX extends Application {
         labelBearing.setText("Bearing ->");
         labelBearing.setStyle("-fx-font: 11 arial; -fx-text-fill: black;");
         labelBearing.setMinWidth(60);
-        
-        // degree, minute and second symbols for LEFT POINT       
-        labelLeftWGS84_degDec_Lat.setText("\u00b0"); // degrees
-        labelLeftWGS84_degDec_Lat.setStyle("-fx-font: 15 arial; -fx-text-fill: black;");
-                
-        labelLeftWGS84_degDecMin_Lat.setText("\u00b0 "); 
-        labelLeftWGS84_degDecMin_Lat.setStyle("-fx-font: 15 arial; -fx-text-fill: black;");
-        labelLeftWGS84_degDecMin_Lat.setMinWidth(77);
-        labelLeftWGS84_minDecMin_Lat.setText("\u2019 "); // minutes
-        labelLeftWGS84_minDecMin_Lat.setStyle("-fx-font: 15 arial; -fx-text-fill: black;");
-        
-        labelLeftWGS84_degDecSec_Lat.setText("\u00b0 "); 
-        labelLeftWGS84_degDecSec_Lat.setStyle("-fx-font: 15 arial; -fx-text-fill: black;");
-        labelLeftWGS84_degDecSec_Lat.setMinWidth(65);
-        labelLeftWGS84_minDecSec_Lat.setText("\u2019 "); 
-        labelLeftWGS84_minDecSec_Lat.setStyle("-fx-font: 15 arial; -fx-text-fill: black;");
-        labelLeftWGS84_minDecSec_Lat.setMinWidth(65);
-        labelLeftWGS84_secDecSec_Lat.setText("\u201D  "); // seconds
-        labelLeftWGS84_secDecSec_Lat.setStyle("-fx-font: 15 arial; -fx-text-fill: black;");
-        
-        
-        labelLeftWGS84_degDec_Lon.setText("\u00b0");
-        labelLeftWGS84_degDec_Lon.setStyle("-fx-font: 15 arial; -fx-text-fill: black;");
-        
-        labelLeftWGS84_degDecMin_Lon.setText("\u00b0");
-        labelLeftWGS84_degDecMin_Lon.setStyle("-fx-font: 15 arial; -fx-text-fill: black;");
-        labelLeftWGS84_degDecMin_Lon.setMinWidth(75);
-        labelLeftWGS84_minDecMin_Lon.setText("\u2019 "); // minutes
-        labelLeftWGS84_minDecMin_Lon.setStyle("-fx-font: 15 arial; -fx-text-fill: black;");
-        
-        labelLeftWGS84_degDecSec_Lon.setText("\u00b0 "); 
-        labelLeftWGS84_degDecSec_Lon.setStyle("-fx-font: 15 arial; -fx-text-fill: black;");
-        labelLeftWGS84_degDecSec_Lon.setMinWidth(65);
-        labelLeftWGS84_minDecSec_Lon.setText("\u2019 "); 
-        labelLeftWGS84_minDecSec_Lon.setStyle("-fx-font: 15 arial; -fx-text-fill: black;");
-        labelLeftWGS84_minDecSec_Lon.setMinWidth(65);
-        labelLeftWGS84_secDecSec_Lon.setText("\u201D  "); // seconds
-        labelLeftWGS84_secDecSec_Lon.setStyle("-fx-font: 15 arial; -fx-text-fill: black;");
-        
-        // degree, minute and second symbols for RIGHT POINT       
-        labelRightWGS84_degDec_Lat.setText("\u00b0"); // degrees
-        labelRightWGS84_degDec_Lat.setStyle("-fx-font: 15 arial; -fx-text-fill: black;");
-               
-        labelRightWGS84_degDecMin_Lat.setText("\u00b0 "); 
-        labelRightWGS84_degDecMin_Lat.setStyle("-fx-font: 15 arial; -fx-text-fill: black;");
-        labelRightWGS84_degDecMin_Lat.setMinWidth(77);
-        labelRightWGS84_minDecMin_Lat.setText("\u2019 "); // minutes
-        labelRightWGS84_minDecMin_Lat.setStyle("-fx-font: 15 arial; -fx-text-fill: black;");
-        
-        labelRightWGS84_degDecSec_Lat.setText("\u00b0 "); 
-        labelRightWGS84_degDecSec_Lat.setStyle("-fx-font: 15 arial; -fx-text-fill: black;");
-        labelRightWGS84_degDecSec_Lat.setMinWidth(65);
-        labelRightWGS84_minDecSec_Lat.setText("\u2019 "); 
-        labelRightWGS84_minDecSec_Lat.setStyle("-fx-font: 15 arial; -fx-text-fill: black;");
-        labelRightWGS84_minDecSec_Lat.setMinWidth(65);
-        labelRightWGS84_secDecSec_Lat.setText("\u201D  "); // seconds
-        labelRightWGS84_secDecSec_Lat.setStyle("-fx-font: 15 arial; -fx-text-fill: black;");
-        
-        
-        labelRightWGS84_degDec_Lon.setText("\u00b0");
-        labelLeftWGS84_degDec_Lon.setStyle("-fx-font: 15 arial; -fx-text-fill: black;");
-        
-        labelRightWGS84_degDecMin_Lon.setText("\u00b0");
-        labelRightWGS84_degDecMin_Lon.setStyle("-fx-font: 15 arial; -fx-text-fill: black;");
-        labelRightWGS84_degDecMin_Lon.setMinWidth(75);
-        labelRightWGS84_minDecMin_Lon.setText("\u2019 "); // minutes
-        labelRightWGS84_minDecMin_Lon.setStyle("-fx-font: 15 arial; -fx-text-fill: black;");
-        
-        labelRightWGS84_degDecSec_Lon.setText("\u00b0 "); 
-        labelRightWGS84_degDecSec_Lon.setStyle("-fx-font: 15 arial; -fx-text-fill: black;");
-        labelRightWGS84_degDecSec_Lon.setMinWidth(65);
-        labelRightWGS84_minDecSec_Lon.setText("\u2019 "); 
-        labelRightWGS84_minDecSec_Lon.setStyle("-fx-font: 15 arial; -fx-text-fill: black;");
-        labelRightWGS84_minDecSec_Lon.setMinWidth(65);
-        labelRightWGS84_secDecSec_Lon.setText("\u201D  "); // seconds
-        labelRightWGS84_secDecSec_Lon.setStyle("-fx-font: 15 arial; -fx-text-fill: black;");
-        
-    
-        //--------------------- panes Tab C layout -------------------------------------
-        
-        BorderPane tabC_borderPane = new BorderPane();
-  
-        HBox leftOSPane = new HBox(labelLeftOS);
-        leftOSPane.setAlignment(Pos.CENTER);
-        leftOSPane.setPadding(new Insets(0, 0, 5, 0));
-        HBox leftOSPane_lbl = new HBox(labelLeftOSEast,labelGap0aa, labelLeftOsSixFigure, labelGap0a, labelLeftOSNorth, labelGap0aaa);
-        HBox leftOSPane_txt = new HBox(textLeftOSEast, labelGap0ba, textLeftOsSixFigure, labelGap0b, textLeftOSNorth, labelGap0baa);
-        VBox leftOSPane_all = new VBox(leftOSPane, leftOSPane_lbl, leftOSPane_txt);
-        leftOSPane_all.setPadding(new Insets(0, 0, 20, 0));
-        leftOSPane_all.setAlignment(Pos.CENTER);
-        
-        VBox leftWGS84_degDecimalPane_Lat = new VBox(labelLeftLat, labelLeftWGS84_degDec_Lat, textLeftWGS84_degDec_Lat);
-        HBox leftWGS84_minDecimalPane_lbl_Lat = new HBox(labelLeftWGS84_degDecMin_Lat, labelLeftWGS84_minDecMin_Lat);
-        HBox leftWGS84_minDecimalPane_txt_Lat = new HBox(textLeftWGS84_degDecMin_Lat, labelGap5,textLeftWGS84_minDecMin_Lat);
-        HBox leftWGS84_secDecimalPane_lbl_Lat = new HBox(labelLeftWGS84_degDecSec_Lat, labelLeftWGS84_minDecSec_Lat, labelLeftWGS84_secDecSec_Lat);
-        HBox leftWGS84_secDecimalPane_txt_Lat = new HBox(textLeftWGS84_degDecSec_Lat, labelGap6, textLeftWGS84_minDecSec_Lat, labelGap7, textLeftWGS84_secDecSec_Lat);
-        
-        VBox leftWGS84_degDecimalPane_Lon = new VBox(labelLeftLon, labelLeftWGS84_degDec_Lon, textLeftWGS84_degDec_Lon);
-        HBox leftWGS84_minDecimalPane_lbl_Lon = new HBox(labelLeftWGS84_degDecMin_Lon, labelLeftWGS84_minDecMin_Lon);
-        HBox leftWGS84_minDecimalPane_txt_Lon = new HBox(textLeftWGS84_degDecMin_Lon, labelGap8, textLeftWGS84_minDecMin_Lon);
-        HBox leftWGS84_secDecimalPane_lbl_Lon = new HBox(labelLeftWGS84_degDecSec_Lon, labelLeftWGS84_minDecSec_Lon, labelLeftWGS84_secDecSec_Lon);
-        HBox leftWGS84_secDecimalPane_txt_Lon = new HBox(textLeftWGS84_degDecSec_Lon, labelGap9, textLeftWGS84_minDecSec_Lon, labelGap10, textLeftWGS84_secDecSec_Lon);
-        
-        
-        
-        HBox rightOSPane = new HBox(labelRightOS);
-        rightOSPane.setAlignment(Pos.CENTER);
-        rightOSPane.setPadding(new Insets(0, 0, 5, 0));
-        HBox rightOSPane_lbl = new HBox(labelRightOSEast,labelGap00aa, labelRightOsSixFigure, labelGap00a, labelRightOSNorth, labelGap00aaa);
-        HBox rightOSPane_txt = new HBox(textRightOSEast, labelGap00ba, textRightOsSixFigure, labelGap00b, textRightOSNorth, labelGap00baa);
-        VBox rightOSPane_all = new VBox(rightOSPane, rightOSPane_lbl, rightOSPane_txt);
-        rightOSPane_all.setPadding(new Insets(0, 0, 20, 0));
-        rightOSPane_all.setAlignment(Pos.CENTER);
-        
-        VBox rightWGS84_degDecimalPane_Lat = new VBox(labelRightLat, labelRightWGS84_degDec_Lat, textRightWGS84_degDec_Lat);
-        HBox rightWGS84_minDecimalPane_lbl_Lat = new HBox(labelRightWGS84_degDecMin_Lat, labelRightWGS84_minDecMin_Lat);
-        HBox rightWGS84_minDecimalPane_txt_Lat = new HBox(textRightWGS84_degDecMin_Lat, labelGap14, textRightWGS84_minDecMin_Lat);
-        HBox rightWGS84_secDecimalPane_lbl_Lat = new HBox(labelRightWGS84_degDecSec_Lat, labelRightWGS84_minDecSec_Lat, labelRightWGS84_secDecSec_Lat);
-        HBox rightWGS84_secDecimalPane_txt_Lat = new HBox(textRightWGS84_degDecSec_Lat, labelGap15, textRightWGS84_minDecSec_Lat, labelGap16, textRightWGS84_secDecSec_Lat);
-        
-        VBox rightWGS84_degDecimalPane_Lon = new VBox(labelRightLon, labelRightWGS84_degDec_Lon, textRightWGS84_degDec_Lon);
-        HBox rightWGS84_minDecimalPane_lbl_Lon = new HBox(labelRightWGS84_degDecMin_Lon, labelRightWGS84_minDecMin_Lon);
-        HBox rightWGS84_minDecimalPane_txt_Lon = new HBox(textRightWGS84_degDecMin_Lon, labelGap17, textRightWGS84_minDecMin_Lon);
-        HBox rightWGS84_secDecimalPane_lbl_Lon = new HBox(labelRightWGS84_degDecSec_Lon, labelRightWGS84_minDecSec_Lon, labelRightWGS84_secDecSec_Lon);
-        HBox rightWGS84_secDecimalPane_txt_Lon = new HBox(textRightWGS84_degDecSec_Lon, labelGap18, textRightWGS84_minDecSec_Lon, labelGap19, textRightWGS84_secDecSec_Lon);
-        
-        
-        VBox leftPointPane_Lat = new VBox(leftWGS84_degDecimalPane_Lat, labelLeftWGS84_minDec_Lat, leftWGS84_minDecimalPane_lbl_Lat, leftWGS84_minDecimalPane_txt_Lat, labelLeftWGS84_secDec_Lat, leftWGS84_secDecimalPane_lbl_Lat, leftWGS84_secDecimalPane_txt_Lat);
-        leftPointPane_Lat.setPadding(new Insets(0, 15, 8, 0));
-        VBox leftPointPane_Lon = new VBox(leftWGS84_degDecimalPane_Lon, labelLeftWGS84_minDec_Lon, leftWGS84_minDecimalPane_lbl_Lon, leftWGS84_minDecimalPane_txt_Lon, labelLeftWGS84_secDec_Lon, leftWGS84_secDecimalPane_lbl_Lon, leftWGS84_secDecimalPane_txt_Lon);
-        leftPointPane_Lon.setPadding(new Insets(0, 15, 8, 0));
-        HBox leftPointPane_LatLong = new HBox(leftPointPane_Lon, leftPointPane_Lat);
-        
-        VBox rightPointPane_Lat = new VBox(rightWGS84_degDecimalPane_Lat, labelRightWGS84_minDec_Lat, rightWGS84_minDecimalPane_lbl_Lat, rightWGS84_minDecimalPane_txt_Lat, labelRightWGS84_secDec_Lat, rightWGS84_secDecimalPane_lbl_Lat, rightWGS84_secDecimalPane_txt_Lat);
-        rightPointPane_Lat.setPadding(new Insets(0, 15, 8, 0));
-        VBox rightPointPane_Lon = new VBox(rightWGS84_degDecimalPane_Lon, labelRightWGS84_minDec_Lon, rightWGS84_minDecimalPane_lbl_Lon, rightWGS84_minDecimalPane_txt_Lon, labelRightWGS84_secDec_Lon, rightWGS84_secDecimalPane_lbl_Lon, rightWGS84_secDecimalPane_txt_Lon);
-        rightPointPane_Lon.setPadding(new Insets(0, 15, 8, 0));
-        HBox rightPointPane_LatLong = new HBox(rightPointPane_Lon, rightPointPane_Lat);
-        
-        HBox buttonLeftPointPane = new HBox(buttonLeftPointConvert, labelGap13, buttonLeftPointClear);
-        buttonLeftPointPane.setAlignment(Pos.CENTER);
-        HBox labelLeftPointPane = new HBox(labelLeftPoint);
-        labelLeftPointPane.setAlignment(Pos.BASELINE_LEFT);
-        VBox coordsLeftPane = new VBox(labelLeftPointPane, leftOSPane_all, leftPointPane_LatLong, buttonLeftPointPane);
-        coordsLeftPane.setPadding(new Insets(0, 10, 0, 0));
-        coordsLeftPane.setAlignment(Pos.CENTER);
-        
-        HBox buttonRightPointPane = new HBox(buttonRightPointConvert, labelGap20, buttonRightPointClear);
-        buttonRightPointPane.setAlignment(Pos.CENTER);
-        HBox labelRightPointPane = new HBox(labelRightPoint);
-        labelRightPointPane.setAlignment(Pos.BASELINE_LEFT);
-        VBox coordsRightPane = new VBox(labelRightPointPane, rightOSPane_all,rightPointPane_LatLong, buttonRightPointPane);
-        coordsRightPane.setPadding(new Insets(0, 0, 0, 10));
-        coordsRightPane.setAlignment(Pos.CENTER);
-        
-        HBox coordsPane = new HBox(coordsLeftPane, coordsRightPane);
-        
-        //HBox labelRightPointPane = new HBox(labelRightPoint);
-        //labelRightPointPane.setAlignment(Pos.BASELINE_LEFT);
-        
-        HBox buttonDistPane = new HBox(buttonDistCalculate, labelGap12, buttonDistConvert, labelGap12a, buttonDistClear);
+
+        /*
+         * Setting Distance and Bearing layout
+         */
+        HBox buttonDistPane = new HBox(buttonDistCalculate, labelGap12, buttonDistConvert,
+                labelGap12a, buttonDistClear);
         buttonDistPane.setPadding(new Insets(8, 0, 0, 0));
         buttonDistPane.setAlignment(Pos.CENTER);
-        HBox distLabelPane = new HBox(labelDistKm, labelDistMilesStatue, labelDistMilesNautical, labelDistMetres, labelDistFt);
+        HBox distLabelPane = new HBox(labelDistKm, labelDistMilesStatue, labelDistMilesNautical,
+                labelDistMetres, labelDistFt);
         distLabelPane.setPadding(new Insets(0, 0, 0, 15));
-        HBox distTextPane = new HBox(textDistKm,labelGap1, textDistMilesStatue, labelGap2, textDistMilesNautical, labelGap3, textDistMetres, labelGap4, textDistFt);
+        HBox distTextPane = new HBox(textDistKm,labelGap1, textDistMilesStatue, labelGap2,
+                textDistMilesNautical, labelGap3, textDistMetres, labelGap4, textDistFt);
         distTextPane.setPadding(new Insets(0, 0, 0, 15));
         HBox distTitlePane = new HBox(lableDistTitle);
         distTitlePane.setPadding(new Insets(10, 0, 0, 180));
         VBox distPane = new VBox(distTitlePane, distLabelPane, distTextPane, buttonDistPane);
         distPane.setPadding(new Insets(0, 15, 0, 5));
         
-        HBox bearingPane = new HBox(buttonBearingCalculate, labelGap22, labelAzimuth, textAzimuth, labelGap26, labelBearing, textBearing, labelGap25, buttonBearingClear, labelGap21, buttonHelp);
+        HBox bearingPane = new HBox(buttonBearingCalculate, labelGap22, labelAzimuth, textAzimuth,
+                labelGap26, labelBearing, textBearing, labelGap25, buttonBearingClear, labelGap21, buttonHelp);
         bearingPane.setPadding(new Insets(25, 15, 0, 5));
         bearingPane.setAlignment(Pos.BASELINE_LEFT);
-        
+
+
+        /*
+         * Setting TabC layout
+         */
         VBox paneCenterC = new VBox(coordsPane, distPane, bearingPane);
         paneCenterC.setPadding(new Insets(0, 20, 20, 20));
         
@@ -1265,12 +1310,342 @@ public class MapConverterFX extends Application {
         tabC_borderPane.setCenter(paneCenterC);
         
         tabC.setContent(tabC_borderPane);
-        
-        
-        //-------------------- ACTIONS TabC ------------------------------------------
-        
-        // ------ LEFT POINT ------
-        
+
+        /************************************* TabD *************************************/
+
+        /*
+         * Top pane with title
+         */
+        Tab tabD = new Tab();
+        tabD.setText("Area & Perimeter  Calculator");
+        Text titleD = new Text("  A r e a   &   P e r i m e t e r     C a l c u l a t o r  ");
+        titleD.setFont(Font.font("Arial", FontWeight.NORMAL, 22));
+        titleD.setFill(Color.NAVY);
+
+        /*
+         * Area section
+         */
+        buttonCalcArea = new Button("Calculate Polygon Area");
+        buttonCalcArea.setMinWidth(200);
+        buttonClearArea= new Button("Clear Area");
+        buttonClearArea.setMinWidth(100);
+        buttonClearArea.setStyle("-fx-text-fill: red;");
+
+        HBox paneAreaButton = new HBox(buttonCalcArea, buttonClearArea);
+        paneAreaButton.setPadding(new Insets(0, 0, 10, 0));
+        paneAreaButton.setSpacing(15);
+
+        textCalcAreaFt2 = new TextField();
+        textCalcAreaFt2.setPrefWidth(80);
+        textCalcAreaMetre2 = new TextField();
+        textCalcAreaMetre2.setPrefWidth(80);
+        textCalcAreaAcre = new TextField();
+        textCalcAreaAcre.setPrefWidth(80);
+        textCalcAreaHa = new TextField();
+        textCalcAreaHa.setPrefWidth(80);
+        labelFt2 = new Label("sq ft");
+        labelFt2.setMinWidth(50);
+        labelFt2.setTextAlignment(TextAlignment.CENTER);
+        labelMetre2 = new Label("sq m");
+        labelMetre2.setMinWidth(50);
+        labelMetre2.setTextAlignment(TextAlignment.CENTER);
+        labelAcre = new Label("acre(s)");
+        labelAcre.setMinWidth(50);
+        labelAcre.setTextAlignment(TextAlignment.CENTER);
+        labelHa = new Label("ha");
+        labelHa.setMinWidth(50);
+        labelHa.setTextAlignment(TextAlignment.CENTER);
+
+        HBox paneAreaText = new HBox(textCalcAreaFt2, labelFt2,textCalcAreaMetre2, labelMetre2,
+                textCalcAreaAcre, labelAcre, textCalcAreaHa, labelHa);
+        paneAreaText.setPadding(new Insets(0, 0, 20, 0));
+        paneAreaText.setSpacing(5);
+
+        VBox paneArea = new VBox(paneAreaButton, paneAreaText);
+
+        /*
+         * Perimeter section
+         */
+        buttonCalcPerim = new Button("Calculate Polygon Perimeter");
+        buttonCalcPerim.setMinWidth(200);
+        buttonClearPerim= new Button("Clear Perimeter");
+        buttonClearPerim.setMinWidth(100);
+        buttonClearPerim.setStyle("-fx-text-fill: red;");
+
+        HBox panePerimButton = new HBox(buttonCalcPerim, buttonClearPerim);
+        panePerimButton.setPadding(new Insets(0, 0, 10, 0));
+        panePerimButton.setSpacing(15);
+
+        textCalcPerimFt = new TextField();
+        textCalcPerimFt.setPrefWidth(80);
+        textCalcPerimMetre = new TextField();
+        textCalcPerimMetre.setPrefWidth(80);
+        textCalcPerimKm = new TextField();
+        textCalcPerimKm.setPrefWidth(80);
+        textCalcPerimMile = new TextField();
+        textCalcPerimMile.setPrefWidth(80);
+        labelFt = new Label("ft");
+        labelFt.setMinWidth(50);
+        labelFt.setTextAlignment(TextAlignment.CENTER);
+        labelMetre = new Label("m");
+        labelMetre.setMinWidth(50);
+        labelMetre.setTextAlignment(TextAlignment.CENTER);
+        labelKm = new Label("Km");
+        labelKm.setMinWidth(50);
+        labelKm.setTextAlignment(TextAlignment.CENTER);
+        labelMile = new Label("Miles");
+        labelMile.setMinWidth(50);
+        labelMile.setTextAlignment(TextAlignment.CENTER);
+
+        HBox panePerimText = new HBox(textCalcPerimFt, labelFt, textCalcPerimMetre, labelMetre,
+                textCalcPerimKm, labelKm, textCalcPerimMile, labelMile);
+        panePerimText.setPadding(new Insets(0, 0, 20, 0));
+        panePerimText.setSpacing(5);
+
+        VBox panePerim = new VBox(panePerimButton, panePerimText);
+
+        VBox paneCalc = new VBox(paneArea, panePerim);
+        paneCalc.setPadding(new Insets(0, 0, 10, 0));
+
+        /*
+         * Adding Points section
+         */
+        labelNumber = new Label("Number");
+        labelNumber.setMinWidth(50);
+        labelNumber.setTextAlignment(TextAlignment.RIGHT);
+        labelEasting = new Label("   Easting");
+        labelEasting.setMinWidth(50);
+        labelEasting.setTextAlignment(TextAlignment.RIGHT);
+        labelNorthing = new Label("  Northing");
+        labelNorthing.setMinWidth(60);
+        labelNorthing.setTextAlignment(TextAlignment.RIGHT);
+        textPointNum = new TextField();
+        textPointNum.setMinWidth(50);
+        textPointNum.setMaxWidth(50);
+        textPointEast = new TextField();
+        textPointEast.setMinWidth(40);
+        textPointNorth = new TextField();
+        textPointNorth.setMinWidth(40);
+        labelPointAdded = new Label("     ");
+        labelPointAdded.setMinWidth(28);
+
+        HBox panePointText = new HBox(labelNumber, textPointNum, labelEasting, textPointEast,
+                labelNorthing, textPointNorth, labelPointAdded);
+        panePointText.setPadding(new Insets(0, 10, 10, 0));
+        panePointText.setSpacing(5);
+
+        buttonAddPoint = new Button("Add New Point");
+        buttonAddPoint.setMinWidth(170);
+        buttonClearPointText = new Button("Clear Point");
+        buttonClearPointText.setMinWidth(170);
+        buttonClearPointText.setStyle("-fx-text-fill: red;");
+        buttonValidatePoint = new Button("Check Polygon");
+        buttonValidatePoint.setMinWidth(110);
+        buttonValidatePoint.setStyle("-fx-text-fill: beige;");
+        HBox paneAddPoint = new HBox(buttonAddPoint, buttonClearPointText, buttonValidatePoint);
+        paneAddPoint.setPadding(new Insets(0, 10, 10, 0));
+        paneAddPoint.setSpacing(15);
+
+        VBox paneInput = new VBox(paneAddPoint, panePointText);
+        paneInput.setPadding(new Insets(0, 10, 10, 0));
+
+        // submit point as the Left Point in the TabC
+        buttonSubmitLeft = new Button("Submit Left Point");
+        buttonSubmitLeft.setPrefWidth(230);
+        labelPointSubmittedLeft = new Label("                     Left Point Submitted");
+        labelPointSubmittedLeft.setPrefWidth(230);
+        labelPointSubmittedLeft.setStyle("-fx-text-fill: grey;");
+        VBox paneLeftSubmitted = new VBox(buttonSubmitLeft, labelPointSubmittedLeft);
+        paneLeftSubmitted.setPadding(new Insets(0, 10, 10, 0));
+        paneLeftSubmitted.setSpacing(10);
+
+        // submit point as the Right Point in the TabC
+        buttonSubmitRight = new Button("Submit Rght Point");
+        buttonSubmitRight.setPrefWidth(230);
+        labelPointSubmittedRight = new Label("                     Right Point Submitted");
+        labelPointSubmittedRight.setPrefWidth(230);
+        labelPointSubmittedRight.setStyle("-fx-text-fill: grey;");
+        VBox paneRightSubmitted = new VBox(buttonSubmitRight, labelPointSubmittedRight);
+        paneRightSubmitted.setPadding(new Insets(0, 10, 10, 0));
+        paneRightSubmitted.setSpacing(10);
+
+        HBox paneSubmit = new HBox(paneLeftSubmitted, paneRightSubmitted);
+        paneSubmit.setAlignment(Pos.BASELINE_LEFT);
+        paneSubmit.setPadding(new Insets(0, 10, 40, 0));
+        paneSubmit.setSpacing(10);
+
+        /*
+         * Read polygon from / Save polygon to a file section
+         */
+        buttonImport = new Button("Import Points From File:");
+        buttonImport.setPrefWidth(200);
+        comboImport = new ComboBox<>();//"Choose file format"
+        comboImport.setPrefWidth(260);
+        comboImport.setPromptText("                    choose file format");
+        comboImport.getItems().addAll(SPACE_SIN_NUMBER, SPACE_WITH_NUMBER, COMMA_SIN_NUMBER, COMMA_WITH_NUMBER);
+
+        buttonExport = new Button("Export List To File:");
+        buttonExport.setPrefWidth(200);
+        comboExport = new ComboBox<>();//"Choose file format"
+        comboExport.setPrefWidth(260);
+        comboExport.setPromptText("                    choose file format");
+        comboExport.getItems().addAll(SPACE_SIN_NUMBER, SPACE_WITH_NUMBER, COMMA_SIN_NUMBER, COMMA_WITH_NUMBER);
+
+        HBox paneImport = new HBox(buttonImport, comboImport);
+        paneImport.setPadding(new Insets(0, 10, 10, 0));
+        paneImport.setSpacing(20);
+        HBox paneExport = new HBox(buttonExport, comboExport);
+        paneExport.setPadding(new Insets(0, 10, 20, 0));
+        paneExport.setSpacing(20);
+
+        /*
+         *  Setting 'Help' button
+         */
+        buttonHelpTabD = new Button("Help");
+        buttonHelpTabD.setStyle("-fx-text-fill: DarkGoldenRod;");
+        HBox paneIHelp = new HBox(buttonHelpTabD);
+        paneIHelp.setAlignment(Pos.BASELINE_LEFT);
+        paneIHelp.setPadding(new Insets(20, 0, 0, 0));
+
+        /*
+         * Table with 'Delete Point' and 'Clear' buttons section
+         */
+        buttonDelPoint = new Button("Delete Point");
+        buttonDelPoint.setPrefWidth(100);
+        buttonClearList = new Button("Clear List");
+        buttonClearList.setPrefWidth(100);
+        buttonClearList.setStyle("-fx-text-fill: red;");
+        labelPointDeleted= new Label("");
+        labelPointDeleted.setPrefWidth(60);
+        labelPointDeleted.setPadding(new Insets(0, 0, 0, 20));
+        HBox paneClearList = new HBox(buttonDelPoint, labelPointDeleted, buttonClearList);
+        paneClearList.setAlignment(Pos.CENTER);
+        paneClearList.setPadding(new Insets(10, 0, 0, 0));
+        paneClearList.setSpacing(10);
+
+        /*
+         * Table for points / polygons
+         */
+        table = new TableView<>();
+        table.setEditable(true);
+
+        TableColumn<Vertex, Integer> colNum = new TableColumn<>("Number");
+        colNum.setMinWidth(50);
+        colNum.setCellValueFactory(new PropertyValueFactory<Vertex, Integer>("Number"));
+        colNum.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
+        colNum.setOnEditCommit(e -> colNum_onEditCommit(e));
+
+        TableColumn<Vertex, Integer> colEast = new TableColumn<>("Easting");
+        colEast.setMinWidth(100);
+        colEast.setCellValueFactory(new PropertyValueFactory<Vertex, Integer>("Easting"));
+        colEast.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
+        colEast.setOnEditCommit(e -> colEast_onEditCommit(e));
+
+        TableColumn<Vertex, Integer> colNorth = new TableColumn<>("Northing");
+        colNorth.setMinWidth(100);
+        colNorth.setCellValueFactory(new PropertyValueFactory<Vertex, Integer>("Northing"));
+        colNorth.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
+        colNorth.setOnEditCommit(e -> colNorth_onEditCommit(e));
+
+        table.getColumns().addAll(colNum, colEast, colNorth);
+        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
+        table.setMinHeight(410);
+
+        /*
+         * Setting TabD layout
+         */
+        BorderPane tabD_borderPane = new BorderPane();
+
+        HBox paneTopD = new HBox(titleD);
+        paneTopD.setAlignment(Pos.CENTER);
+        paneTopD.setPadding(new Insets(20, 20, 30, 0));
+
+        VBox paneControl = new VBox(paneCalc, paneInput, paneSubmit, paneImport, paneExport, paneIHelp);
+        paneControl.setPadding(new Insets(0, 15, 0, 0));
+
+        VBox paneTable = new VBox(table, paneClearList);
+        paneTable.setPadding(new Insets(0, 20, 0, 0));
+        paneTable.setAlignment(Pos.BOTTOM_RIGHT);
+
+        HBox paneCenterD = new HBox(paneControl);
+        paneCenterD.setPadding(new Insets(0, 0, 15, 20));
+
+        HBox paneRightD = new HBox(paneTable);
+        paneRightD.setPadding(new Insets(0, 0, 15, 20));
+
+        tabD_borderPane.setTop(paneTopD);
+        tabD_borderPane.setCenter(paneCenterD);
+        tabD_borderPane.setRight(paneRightD);
+
+        tabD.setContent(tabD_borderPane);
+
+
+        /************************************* TabE *************************************/
+
+        Tab tabE = new Tab();
+        tabE.setText("About");
+
+        TextArea about = new TextArea();
+        about.setEditable(false);
+        about.setText(""
+                + "Copyright (C) 2017  Piotr Czapik.\n"
+                + "Copyright (C) 2019  Piotr Czapik.\n"
+
+                + "@author Piotr Czapik\n"
+                + "@version 4.5\n"
+                + "\n"
+                + "MapCalculatorFX is free software: you can redistribute it and/or modify\n"
+                + "it under the terms of the GNU General Public License as published by\n"
+                + "the Free Software Foundation, either version 3 of the License, or\n"
+                + "(at your option) any later version.\n"
+                + "\n"
+                + "MapCalculatorFX is distributed in the hope that it will be useful,\n"
+                + "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
+                + "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
+                + "GNU General Public License for more details.\n"
+                + "\n"
+                + "You should have received a copy of the GNU General Public License\n"
+                + "along with MapCalculatorFX.  If not, see <http://www.gnu.org/licenses/>\n"
+                + "or write to: latidude99@gmail.com \n"
+                + "\n"
+                + "\n"
+                + "\n"
+                + "Libraries used:\n"
+                + "\n"
+                + "(for calculations on Coordinate Converter tab)\n"
+                + "\n"
+                + "Jcoord v.1.0 (C) 2006 Jonathan Stott\n"
+                + "available at http://www.jstott.me.uk/jcoord/ under GPLv2 license        		\n");
+
+        tabE.setContent(about);
+
+        /****************************** Setting up Scene and Stage *****************************/
+
+        tabPane.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
+
+        tabPane.getTabs().addAll(tabA, tabB, tabC, tabD, tabE);
+        mainPane.setCenter(tabPane);
+
+        Group root = new Group();
+        root.getChildren().add(mainPane);
+        Scene scene = new Scene(root, 885, 555);
+
+        mainPane.prefHeightProperty().bind(scene.heightProperty());
+        mainPane.prefWidthProperty().bind(scene.widthProperty());
+
+
+        primaryStage.setScene(scene);
+        primaryStage.setTitle(" Map Calculator v4.5");
+        setUserAgentStylesheet(STYLESHEET_CASPIAN);
+        primaryStage.show();
+
+
+
+        /*************************** TabC buttons and text fields actions ***************************/
+
+        /*
+         * Left Point
+         */
         buttonLeftPointConvert.setOnAction(this::readLeftPoint);
         buttonLeftPointClear.setOnAction(this::clearLeftPoint);
         
@@ -1281,7 +1656,6 @@ public class MapConverterFX extends Application {
         		clearLeftAllFromOSSixFigure();
           	}
         });
-        
         textLeftOSEast.textProperty().addListener((obs, oldVal, newVal) -> textLeftOSEast.setText(newVal.replaceAll("[^\\d.\\.\\d.]", "")));
         textLeftOSEast.setOnKeyPressed(new EventHandler<KeyEvent>(){
         	@Override
@@ -1289,7 +1663,6 @@ public class MapConverterFX extends Application {
         		clearLeftAllFromOS();
         	}
         });
-  
         textLeftOSNorth.textProperty().addListener((obs, oldVal, newVal) -> textLeftOSNorth.setText(newVal.replaceAll("[^\\d.\\.\\d.]", "")));
         textLeftOSNorth.setOnKeyPressed(new EventHandler<KeyEvent>(){
         	@Override
@@ -1297,7 +1670,6 @@ public class MapConverterFX extends Application {
         		clearLeftAllFromOS();
         	}
         });
-        
         textLeftWGS84_degDec_Lat.textProperty().addListener((obs, oldVal, newVal) -> textLeftWGS84_degDec_Lat.setText(newVal.replaceAll("[^\\-\\d.\\.\\d.]", "")));
         textLeftWGS84_degDec_Lat.setOnKeyPressed(new EventHandler<KeyEvent>(){
         	@Override
@@ -1313,7 +1685,6 @@ public class MapConverterFX extends Application {
         		clearLeftAllFromDecDeg();
         	}
         });
-        
         textLeftWGS84_degDecMin_Lat.textProperty().addListener((obs, oldVal, newVal) -> textLeftWGS84_degDecMin_Lat.setText(newVal.replaceAll("[^\\-\\d.\\.\\d.]", "")));
         textLeftWGS84_degDecMin_Lat.setOnKeyPressed(new EventHandler<KeyEvent>(){
         	@Override
@@ -1385,10 +1756,10 @@ public class MapConverterFX extends Application {
         		clearLeftAllFromDecSec();
         	}
         });
-        
-        
-        // ------ RIGHT POINT ------
-                
+
+        /*
+         * Right Point
+         */
         buttonRightPointConvert.setOnAction(this::readRightPoint);
         buttonRightPointClear.setOnAction(this::clearRightPoint);
         
@@ -1399,7 +1770,6 @@ public class MapConverterFX extends Application {
         		clearRightAllFromOSSixFigure();
         	}
         });
-        
         textRightOSEast.textProperty().addListener((obs, oldVal, newVal) -> textRightOSEast.setText(newVal.replaceAll("[^\\d.\\.\\d.]", "")));
         textRightOSEast.setOnKeyPressed(new EventHandler<KeyEvent>(){
         	@Override
@@ -1414,7 +1784,6 @@ public class MapConverterFX extends Application {
         		clearRightAllFromOS();
         	}
         });
-        
         textRightWGS84_degDec_Lat.textProperty().addListener((obs, oldVal, newVal) -> textRightWGS84_degDec_Lat.setText(newVal.replaceAll("[^\\-\\d.\\.\\d.]", "")));
         textRightWGS84_degDec_Lat.setOnKeyPressed(new EventHandler<KeyEvent>(){
         	@Override
@@ -1429,7 +1798,6 @@ public class MapConverterFX extends Application {
         		clearRightAllFromDecDeg();
         	}
         });
-        
         textRightWGS84_degDecMin_Lat.textProperty().addListener((obs, oldVal, newVal) -> textRightWGS84_degDecMin_Lat.setText(newVal.replaceAll("[^\\-\\d.\\.\\d.]", "")));
         textRightWGS84_degDecMin_Lat.setOnKeyPressed(new EventHandler<KeyEvent>(){
         	@Override
@@ -1458,7 +1826,6 @@ public class MapConverterFX extends Application {
         		clearRightAllFromDecMin();
         	}
         });
-        
         textRightWGS84_degDecSec_Lat.textProperty().addListener((obs, oldVal, newVal) -> textRightWGS84_degDecSec_Lat.setText(newVal.replaceAll("[^\\-\\d.\\.\\d.]", "")));
         textRightWGS84_degDecSec_Lat.setOnKeyPressed(new EventHandler<KeyEvent>(){
         	@Override
@@ -1501,11 +1868,10 @@ public class MapConverterFX extends Application {
         		clearRightAllFromDecSec();
         	}
         });
-        
-       
-        
-        // --- DISTANCE & BEARING ---
-        
+
+        /*
+         * Distance and Bearing
+         */
         buttonDistConvert.setOnAction(this::convertAndSetDistanceTabC); //calculating and setting DISTANCE fields
         buttonDistClear.setOnAction(this::clearDistFields); //clears DISTANCE text fields
         
@@ -1515,7 +1881,6 @@ public class MapConverterFX extends Application {
         	textAzimuth.clear();
         	textBearing.clear();
         });
-        
         textDistKm.textProperty().addListener((obs, oldVal, newVal) -> textDistKm.setText(newVal.replaceAll("[^\\d.\\.\\d.]", "")));
         textDistKm.setOnKeyPressed(new EventHandler<KeyEvent>(){
         	@Override
@@ -1526,7 +1891,6 @@ public class MapConverterFX extends Application {
         		textDistFt.clear();
         	}
         });
-        
         textDistMilesStatue.textProperty().addListener((obs, oldVal, newVal) -> textDistMilesStatue.setText(newVal.replaceAll("[^\\d.\\.\\d.]", "")));
         textDistMilesStatue.setOnKeyPressed(new EventHandler<KeyEvent>(){
         	@Override
@@ -1537,7 +1901,6 @@ public class MapConverterFX extends Application {
         		textDistFt.clear();
         	}
         });
-        
         textDistMilesNautical.textProperty().addListener((obs, oldVal, newVal) -> textDistMilesNautical.setText(newVal.replaceAll("[^\\d.\\.\\d.]", "")));
         textDistMilesNautical.setOnKeyPressed(new EventHandler<KeyEvent>(){
         	@Override
@@ -1548,7 +1911,6 @@ public class MapConverterFX extends Application {
         		textDistFt.clear();
         	}
         });
-        
         textDistMetres.textProperty().addListener((obs, oldVal, newVal) -> textDistMetres.setText(newVal.replaceAll("[^\\d.\\.\\d.]", "")));
         textDistMetres.setOnKeyPressed(new EventHandler<KeyEvent>(){
         	@Override
@@ -1559,7 +1921,6 @@ public class MapConverterFX extends Application {
         		textDistFt.clear();
         	}
         });
-        
         textDistFt.textProperty().addListener((obs, oldVal, newVal) -> textDistFt.setText(newVal.replaceAll("[^\\d.\\.\\d.]", "")));
         textDistFt.setOnKeyPressed(new EventHandler<KeyEvent>(){
         	@Override
@@ -1572,348 +1933,17 @@ public class MapConverterFX extends Application {
         });
         
         buttonHelp.setOnAction(e -> ImageBox.show("Help for Coordinate Converter", "Help", IMAGE_TAB_C1, IMAGE_TAB_C2));
-        
-        
-                
-        
-      //--------------------- panes Tab D layout -------------------------------------
-        
-        //-------- top pane for title ----------
-        Tab tabD = new Tab();
-        tabD.setText("Area & Perimeter  Calculator");
-        
-        Text titleD = new Text("  A r e a   &   P e r i m e t e r     C a l c u l a t o r  ");
-        titleD.setFont(Font.font("Arial", FontWeight.NORMAL, 22));
-        titleD.setFill(Color.NAVY);
-        
-        //--------center pane --------------------
-        
-        buttonCalcArea = new Button("Calculate Polygon Area");
-        buttonCalcArea.setMinWidth(200);
-        buttonClearArea= new Button("Clear Area");
-        buttonClearArea.setMinWidth(100);
-        buttonClearArea.setStyle("-fx-text-fill: red;");
-        
-        HBox paneAreaButton = new HBox(buttonCalcArea, buttonClearArea);
-        paneAreaButton.setPadding(new Insets(0, 0, 10, 0));
-        paneAreaButton.setSpacing(15);
-        
-        textCalcAreaFt2 = new TextField();
-        textCalcAreaFt2.setPrefWidth(80);
-        textCalcAreaMetre2 = new TextField();
-        textCalcAreaMetre2.setPrefWidth(80);
-        textCalcAreaAcre = new TextField();
-        textCalcAreaAcre.setPrefWidth(80);
-        textCalcAreaHa = new TextField();
-        textCalcAreaHa.setPrefWidth(80);
-        labelFt2 = new Label("sq ft");
-        labelFt2.setMinWidth(50);
-        labelFt2.setTextAlignment(TextAlignment.CENTER);
-        labelMetre2 = new Label("sq m");
-        labelMetre2.setMinWidth(50);
-        labelMetre2.setTextAlignment(TextAlignment.CENTER);
-        labelAcre = new Label("acre(s)");
-        labelAcre.setMinWidth(50);
-        labelAcre.setTextAlignment(TextAlignment.CENTER);
-        labelHa = new Label("ha");
-        labelHa.setMinWidth(50);
-        labelHa.setTextAlignment(TextAlignment.CENTER);
 
-        HBox paneAreaText = new HBox(textCalcAreaFt2, labelFt2,textCalcAreaMetre2, labelMetre2, 
-        								textCalcAreaAcre, labelAcre, textCalcAreaHa, labelHa);
-        paneAreaText.setPadding(new Insets(0, 0, 20, 0));
-        paneAreaText.setSpacing(5);
-        
-        
-        VBox paneArea = new VBox(paneAreaButton, paneAreaText);
-        
-        buttonCalcPerim = new Button("Calculate Polygon Perimeter");
-        buttonCalcPerim.setMinWidth(200);
-        buttonClearPerim= new Button("Clear Perimeter");
-        buttonClearPerim.setMinWidth(100);
-        buttonClearPerim.setStyle("-fx-text-fill: red;");
-                
-        HBox panePerimButton = new HBox(buttonCalcPerim, buttonClearPerim);
-        panePerimButton.setPadding(new Insets(0, 0, 10, 0));
-        panePerimButton.setSpacing(15);
-        
-        textCalcPerimFt = new TextField();
-        textCalcPerimFt.setPrefWidth(80);
-        textCalcPerimMetre = new TextField();
-        textCalcPerimMetre.setPrefWidth(80);
-        textCalcPerimKm = new TextField();
-        textCalcPerimKm.setPrefWidth(80);
-        textCalcPerimMile = new TextField();
-        textCalcPerimMile.setPrefWidth(80);
-        labelFt = new Label("ft");
-        labelFt.setMinWidth(50);
-        labelFt.setTextAlignment(TextAlignment.CENTER);
-        labelMetre = new Label("m");
-        labelMetre.setMinWidth(50);
-        labelMetre.setTextAlignment(TextAlignment.CENTER);
-        labelKm = new Label("Km");
-        labelKm.setMinWidth(50);
-        labelKm.setTextAlignment(TextAlignment.CENTER);
-        labelMile = new Label("Miles");
-        labelMile.setMinWidth(50);
-        labelMile.setTextAlignment(TextAlignment.CENTER);
-        
-        HBox panePerimText = new HBox(textCalcPerimFt, labelFt, textCalcPerimMetre, labelMetre,
-        								textCalcPerimKm, labelKm, textCalcPerimMile, labelMile);
-        panePerimText.setPadding(new Insets(0, 0, 20, 0));
-        panePerimText.setSpacing(5);
-        
-        VBox panePerim = new VBox(panePerimButton, panePerimText);
-        
-        VBox paneCalc = new VBox(paneArea, panePerim);
-        paneCalc.setPadding(new Insets(0, 0, 10, 0));
-        
-        
-        labelNumber = new Label("Number");
-        labelNumber.setMinWidth(50);
-        labelNumber.setTextAlignment(TextAlignment.RIGHT);
-        labelEasting = new Label("   Easting");
-        labelEasting.setMinWidth(50);
-        labelEasting.setTextAlignment(TextAlignment.RIGHT);
-        labelNorthing = new Label("  Northing");
-        labelNorthing.setMinWidth(60);
-        labelNorthing.setTextAlignment(TextAlignment.RIGHT);
-        textPointNum = new TextField();
-        textPointNum.setMinWidth(50);
-        textPointNum.setMaxWidth(50);
-        textPointEast = new TextField();
-        textPointEast.setMinWidth(40);
-        textPointNorth = new TextField();
-        textPointNorth.setMinWidth(40);
-        labelPointAdded = new Label("     ");
-        labelPointAdded.setMinWidth(28);
-        
-        //labelPointAdded.setPadding(new Insets(0, 0, 0, 20));
-        HBox panePointText = new HBox(labelNumber, textPointNum, labelEasting, textPointEast,
-        		labelNorthing, textPointNorth, labelPointAdded);
-        panePointText.setPadding(new Insets(0, 10, 10, 0));
-        panePointText.setSpacing(5);
-        
-        buttonAddPoint = new Button("Add New Point");
-        buttonAddPoint.setMinWidth(170);
-        buttonClearPointText = new Button("Clear Point");
-        buttonClearPointText.setMinWidth(170);
-        buttonClearPointText.setStyle("-fx-text-fill: red;");
-        buttonValidatePoint = new Button("Check Polygon");
-        buttonValidatePoint.setMinWidth(110);
-        buttonValidatePoint.setStyle("-fx-text-fill: beige;");
-        HBox paneAddPoint = new HBox(buttonAddPoint, buttonClearPointText, buttonValidatePoint);
-        paneAddPoint.setPadding(new Insets(0, 10, 10, 0));
-        paneAddPoint.setSpacing(15);
-        
-        VBox paneInput = new VBox(paneAddPoint, panePointText);
-        paneInput.setPadding(new Insets(0, 10, 10, 0));
-        
-        
-        buttonSubmitLeft = new Button("Submit Left Point");
-        buttonSubmitLeft.setPrefWidth(230);
-        labelPointSubmittedLeft = new Label("                     Left Point Submitted");
-        labelPointSubmittedLeft.setPrefWidth(230);
-        labelPointSubmittedLeft.setStyle("-fx-text-fill: grey;");
-        VBox paneLeftSubmitted = new VBox(buttonSubmitLeft, labelPointSubmittedLeft);
-        paneLeftSubmitted.setPadding(new Insets(0, 10, 10, 0));
-        paneLeftSubmitted.setSpacing(10);
-        
-        buttonSubmitRight = new Button("Submit Rght Point");
-        buttonSubmitRight.setPrefWidth(230);
-        labelPointSubmittedRight = new Label("                     Right Point Submitted");
-        labelPointSubmittedRight.setPrefWidth(230);
-        labelPointSubmittedRight.setStyle("-fx-text-fill: grey;");
-        VBox paneRightSubmitted = new VBox(buttonSubmitRight, labelPointSubmittedRight);
-        paneRightSubmitted.setPadding(new Insets(0, 10, 10, 0));
-        paneRightSubmitted.setSpacing(10);
-        
-        HBox paneSubmit = new HBox(paneLeftSubmitted, paneRightSubmitted);
-        paneSubmit.setAlignment(Pos.BASELINE_LEFT);
-        paneSubmit.setPadding(new Insets(0, 10, 40, 0));
-        paneSubmit.setSpacing(10);
-        
-        
-        
-        buttonImport = new Button("Import Points From File:");
-        buttonImport.setPrefWidth(200);
-        comboImport = new ComboBox<>();//"Choose file format"
-        comboImport.setPrefWidth(260);
-        comboImport.setPromptText("                    choose file format");
-        comboImport.getItems().addAll(SPACE_SIN_NUMBER, SPACE_WITH_NUMBER, COMMA_SIN_NUMBER, COMMA_WITH_NUMBER);
-        
-        buttonExport = new Button("Export List To File:");
-        buttonExport.setPrefWidth(200);
-        comboExport = new ComboBox<>();//"Choose file format"
-        comboExport.setPrefWidth(260);
-        comboExport.setPromptText("                    choose file format");
-        comboExport.getItems().addAll(SPACE_SIN_NUMBER, SPACE_WITH_NUMBER, COMMA_SIN_NUMBER, COMMA_WITH_NUMBER);
-                
-        HBox paneImport = new HBox(buttonImport, comboImport);
-        paneImport.setPadding(new Insets(0, 10, 10, 0));
-        paneImport.setSpacing(20);
-        HBox paneExport = new HBox(buttonExport, comboExport);
-        paneExport.setPadding(new Insets(0, 10, 20, 0));
-        paneExport.setSpacing(20);
-        
-        
-        
-        buttonHelpTabD = new Button("Help");
-        buttonHelpTabD.setStyle("-fx-text-fill: DarkGoldenRod;");
-        HBox paneIHelp = new HBox(buttonHelpTabD);
-        paneIHelp.setAlignment(Pos.BASELINE_LEFT);
-        paneIHelp.setPadding(new Insets(20, 0, 0, 0));
-        
-        
-        buttonDelPoint = new Button("Delete Point");
-        buttonDelPoint.setPrefWidth(100);
-        buttonClearList = new Button("Clear List");
-        buttonClearList.setPrefWidth(100);
-        buttonClearList.setStyle("-fx-text-fill: red;");
-        labelPointDeleted= new Label("");
-        labelPointDeleted.setPrefWidth(60);
-        labelPointDeleted.setPadding(new Insets(0, 0, 0, 20));
-        HBox paneClearList = new HBox(buttonDelPoint, labelPointDeleted, buttonClearList);
-        paneClearList.setAlignment(Pos.CENTER);
-        paneClearList.setPadding(new Insets(10, 0, 0, 0));
-        paneClearList.setSpacing(10);
-        
-        table = new TableView<>();
-        table.setEditable(true);
-        
-        TableColumn<Vertex, Integer> colNum = new TableColumn<>("Number");
-        colNum.setMinWidth(50);
-        colNum.setCellValueFactory(new PropertyValueFactory<Vertex, Integer>("Number"));
-        colNum.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
-        colNum.setOnEditCommit(e -> colNum_onEditCommit(e));
-        
-        TableColumn<Vertex, Integer> colEast = new TableColumn<>("Easting");
-        colEast.setMinWidth(100);
-        colEast.setCellValueFactory(new PropertyValueFactory<Vertex, Integer>("Easting"));
-        colEast.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
-        colEast.setOnEditCommit(e -> colEast_onEditCommit(e));
-        
-        TableColumn<Vertex, Integer> colNorth = new TableColumn<>("Northing");
-        colNorth.setMinWidth(100);
-        colNorth.setCellValueFactory(new PropertyValueFactory<Vertex, Integer>("Northing"));
-        colNorth.setCellFactory(TextFieldTableCell.forTableColumn(new IntegerStringConverter()));
-        colNorth.setOnEditCommit(e -> colNorth_onEditCommit(e));
-        
-        table.getColumns().addAll(colNum, colEast, colNorth);
-        table.setColumnResizePolicy(TableView.CONSTRAINED_RESIZE_POLICY);
-        table.setMinHeight(410);
-        
- /*       Vertex v1 = new Vertex(1, 10, 10); // vertexes for testing
-        Vertex v2 = new Vertex(2, 12, 12);
-        Vertex v3 = new Vertex(3, 15, 10);
-        Vertex v4 = new Vertex(4, 10, 7);
-        Vertex v5 = new Vertex(5, 7, 5);
-        Vertex v6 = new Vertex(6, 5, 8);
-        table.getItems().addAll(v1, v2, v3, v4, v5, v6);
- */       
-        
-        //-------- pane layout ----------------- 
-        
-        BorderPane tabD_borderPane = new BorderPane();
-        
-        HBox paneTopD = new HBox(titleD);
-        paneTopD.setAlignment(Pos.CENTER);
-        paneTopD.setPadding(new Insets(20, 20, 30, 0));
-        
-        VBox paneControl = new VBox(paneCalc, paneInput, paneSubmit, paneImport, paneExport, paneIHelp);
-        paneControl.setPadding(new Insets(0, 15, 0, 0));
-        
-        VBox paneTable = new VBox(table, paneClearList);
-        paneTable.setPadding(new Insets(0, 20, 0, 0));
-        paneTable.setAlignment(Pos.BOTTOM_RIGHT);
-        
-        HBox paneCenterD = new HBox(paneControl);
-        paneCenterD.setPadding(new Insets(0, 0, 15, 20));
-        //paneCenterD.setSpacing(150);
-        //paneCenterD.setAlignment(Pos.BOTTOM_RIGHT);
-        
-        HBox paneRightD = new HBox(paneTable);
-        paneRightD.setPadding(new Insets(0, 0, 15, 20));
-        
-        tabD_borderPane.setTop(paneTopD);
-        tabD_borderPane.setCenter(paneCenterD);
-        tabD_borderPane.setRight(paneRightD);
-        
-        tabD.setContent(tabD_borderPane);
-        
-        
-        //--------------------- panes Tab E layout -------------------------------------
-        
-        Tab tabE = new Tab();
-        tabE.setText("About");
-        
-        TextArea about = new TextArea();
-        about.setEditable(false);
-        about.setText(""
-        		+ "Copyright (C) 2017  Piotr Czapik.\n"
-        		+ "Copyright (C) 2019  Piotr Czapik.\n"
 
-        		+ "@author Piotr Czapik\n"
-        		+ "@version 4.5\n"
-        		+ "\n"
-        		+ "MapCalculatorFX is free software: you can redistribute it and/or modify\n"
-        		+ "it under the terms of the GNU General Public License as published by\n"
-        		+ "the Free Software Foundation, either version 3 of the License, or\n"
-        		+ "(at your option) any later version.\n"
-        		+ "\n"
-        		+ "MapCalculatorFX is distributed in the hope that it will be useful,\n"
-        		+ "but WITHOUT ANY WARRANTY; without even the implied warranty of\n"
-        		+ "MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the\n"
-        		+ "GNU General Public License for more details.\n"
-        		+ "\n"
-        		+ "You should have received a copy of the GNU General Public License\n"
-        		+ "along with MapCalculatorFX.  If not, see <http://www.gnu.org/licenses/>\n"
-        		+ "or write to: latidude99@gmail.com \n"
-        		+ "\n"
-        		+ "\n"
-        		+ "\n"
-        		+ "Libraries used:\n"
-        		+ "\n"
-        		+ "(for calculations on Coordinate Converter tab)\n"
-        		+ "\n"
-        		+ "Jcoord v.1.0 (C) 2006 Jonathan Stott\n"
-        		+ "available at http://www.jstott.me.uk/jcoord/ under GPLv2 license        		\n");
-       
-        tabE.setContent(about);
-        
-        
-        //================ setting up the scene and stage =====================
-    	
-    	tabPane.setTabClosingPolicy(TabClosingPolicy.UNAVAILABLE);
-    	
-    	tabPane.getTabs().addAll(tabA, tabB, tabC, tabD, tabE);
-    	mainPane.setCenter(tabPane);
-        
-        Group root = new Group();
-        root.getChildren().add(mainPane);
-        Scene scene = new Scene(root, 885, 555);
-        
-        mainPane.prefHeightProperty().bind(scene.heightProperty());
-        mainPane.prefWidthProperty().bind(scene.widthProperty());
+        /*************************** TabD buttons and text fields actions ***************************/
 
-        
-        primaryStage.setScene(scene);
-        primaryStage.setTitle(" Map Calculator v4.5");
-        setUserAgentStylesheet(STYLESHEET_CASPIAN);
-        primaryStage.show();
-        
-      //----------------------------- ACTIONS Tab D ------------------------------------------
-        //System.out.println(table.getItems().get(0).getEasting());
-        //System.out.println("area = " + calcArea(table.getItems()) + "m2");
-        //System.out.println("perimeter = " + calcPerim(table.getItems()) + "m");
-        
         buttonCalcArea.setOnAction(this::setArea);
         buttonCalcPerim.setOnAction(this::setPerimeter);
         buttonClearArea.setOnAction(e -> clearAreaFields());
         buttonClearPerim.setOnAction(e -> clearPerimFields());
         
-        buttonValidatePoint.setOnAction(e -> PolygonBox.show("Polygon", "Polygon Check", table.getItems()));
-        
+        buttonValidatePoint.setOnAction(
+                e -> PolygonBox.show("Polygon", "Polygon Check", table.getItems()));
         buttonSubmitLeft.setOnAction(e -> {clearLeftPoint(e);
         									selectLeftPoint(e);
         									readLeftPoint(e);
@@ -1921,9 +1951,7 @@ public class MapConverterFX extends Application {
         buttonSubmitRight.setOnAction(e -> {clearRightPoint(e);
         										selectRightPoint(e);
 												readRightPoint(e);
-        							});	
-        
-                
+        							});
         buttonImport.setOnAction(e -> {importVertexes(e);
         								labelPointDeleted.setStyle("-fx-text-fill: blue;");
         								labelPointDeleted.setText(table.getItems().size() + " pts");
@@ -1933,40 +1961,36 @@ public class MapConverterFX extends Application {
         buttonAddPoint.setOnAction(e -> {addVertex(e);
         								labelPointDeleted.setText(table.getItems().size() + " pts");
         							});
-        
         buttonClearPointText.setOnAction(e -> {textPointNum.clear();
         										textPointEast.clear();
         										textPointNorth.clear();
         								});
-        
         buttonDelPoint.setOnAction(e -> {deleteVertex(e);
         								labelPointDeleted.setText(table.getItems().size() + " pts");
         							});
-        
         buttonClearList.setOnAction(e -> {table.getItems().clear();
         									clearAreaFields();
         									clearPerimFields();
         									labelPointDeleted.setText(table.getItems().size() + " pts");
         								});
-        
-        buttonHelpTabD.setOnAction(e -> ImageBox.show("Area Calculator Help", "Help", IMAGE_TAB_D1, IMAGE_TAB_D2));
-        
-        textPointNum.textProperty().addListener((obs, oldVal, newVal) -> textPointNum.setText(newVal.replaceAll("[^0-9]", "")));
+        buttonHelpTabD.setOnAction(e -> ImageBox.show(
+                "Area Calculator Help", "Help", IMAGE_TAB_D1, IMAGE_TAB_D2));
+        textPointNum.textProperty().addListener((obs, oldVal, newVal) ->
+                textPointNum.setText(newVal.replaceAll("[^0-9]", "")));
         textPointNum.setOnKeyPressed(new EventHandler<KeyEvent>(){
         	@Override
         	public void handle(KeyEvent event){
         		labelPointAdded.setText("     ");
         	}
         });
-        
-        textPointEast.textProperty().addListener((obs, oldVal, newVal) -> textPointEast.setText(newVal.replaceAll("[^0-9]", "")));
+        textPointEast.textProperty().addListener((obs, oldVal, newVal) ->
+                textPointEast.setText(newVal.replaceAll("[^0-9]", "")));
         textPointEast.setOnKeyPressed(new EventHandler<KeyEvent>(){
         	@Override
         	public void handle(KeyEvent event){
         		labelPointAdded.setText("     ");
         	}
         });
-        
         textPointNorth.textProperty().addListener((obs, oldVal, newVal) -> textPointNorth.setText(newVal.replaceAll("[^0-9]", "")));
         textPointNorth.setOnKeyPressed(new EventHandler<KeyEvent>(){
         	@Override
@@ -1974,238 +1998,15 @@ public class MapConverterFX extends Application {
         		labelPointAdded.setText("     ");
         	}
         });
-        
-        
-        
-        
+
     }
     
-  //============================= methods for Area Calculator Tab D ==!!!!!!! (to be moved to below Tab C)!!!!!
-    
-    private void clearAreaFields(){
-    	textCalcAreaFt2.clear();
-		textCalcAreaMetre2.clear();
-		textCalcAreaAcre.clear();
-		textCalcAreaHa.clear();
-	}
-    
-    private void clearPerimFields(){
-    	textCalcPerimFt.clear();
-    	textCalcPerimMetre.clear();
-    	textCalcPerimKm.clear();
-    	textCalcPerimMile.clear();
-    }
-    
-    private void selectLeftPoint(ActionEvent event){
-    	if(table.getSelectionModel().getSelectedItem() != null){
-	    	textLeftOSEast.setText(Integer.toString(table.getSelectionModel().getSelectedItem().getEasting()));
-	    	textLeftOSNorth.setText(Integer.toString(table.getSelectionModel().getSelectedItem().getNorthing()));
-	    	labelPointSubmittedLeft.setStyle("-fx-text-fill: blue;");
-    	}
-    }
-    
-	private void selectRightPoint(ActionEvent event){
-		if(table.getSelectionModel().getSelectedItem() != null){
-			textRightOSEast.setText(Integer.toString(table.getSelectionModel().getSelectedItem().getEasting()));
-	    	textRightOSNorth.setText(Integer.toString(table.getSelectionModel().getSelectedItem().getNorthing()));
-	    	labelPointSubmittedRight.setStyle("-fx-text-fill: blue;");
-		}
-	}
-    
-    private void colNum_onEditCommit(Event e){
-    	TableColumn.CellEditEvent<Vertex, Integer> ce;
-    	ce = (TableColumn.CellEditEvent<Vertex, Integer>) e;
-    	Vertex v = ce.getRowValue();
-    	v.setNumber(ce.getNewValue());
-    }
-    
-    private void colEast_onEditCommit(Event e){
-    	TableColumn.CellEditEvent<Vertex, Integer> ce;
-    	ce = (TableColumn.CellEditEvent<Vertex, Integer>) e;
-    	Vertex v = ce.getRowValue();
-    	v.setEasting(ce.getNewValue());
-    }
-    
-    private void colNorth_onEditCommit(Event e){
-    	TableColumn.CellEditEvent<Vertex, Integer> ce;
-    	ce = (TableColumn.CellEditEvent<Vertex, Integer>) e;
-    	Vertex v = ce.getRowValue();
-    	v.setNorthing(ce.getNewValue());
-    }
-    
-    private void importVertexes(ActionEvent event){
-    	try{
-	    	labelPointAdded.setText("     ");
-	    	String option = null; //= SPACE_SIN_NUMBER;
-	    	if(comboImport.getValue() != null){
-	    		option = comboImport.getValue();
-	    		//System.out.println("import = " + comboImport.getValue());
-	    	   	switch(option){
-		    	case SPACE_SIN_NUMBER:
-		    		table.getItems().setAll(VertexPolygon.readPolygonSinNum_space());
-		    		break;
-		    	case SPACE_WITH_NUMBER:
-		    		table.getItems().setAll(VertexPolygon.readPolygonWithNum_space());
-		    		break;
-		    	case COMMA_SIN_NUMBER:
-		    		table.getItems().setAll(VertexPolygon.readPolygonSinNum_comma());
-		    		break;
-		   		case COMMA_WITH_NUMBER:
-		   			table.getItems().setAll(VertexPolygon.readPolygonWithNum_comma());
-		   			break;
-		    	default:
-		    		MessageBox.show("Choose file format", "Insufficient information");
-		    	}
-	    	}else{
-	    		MessageBox.show("Choose file format", "Insufficient information");
-	    	}
-    }catch(NumberFormatException e){
-			MessageBox.show("Declared file format does not match the actual file format", "Input error");
-		}
-    }
-    
-    private void exportVertexes(ActionEvent event){
-    	labelPointAdded.setText("     ");
-    		if (table.getItems().size() > 0){
-        		String option = SPACE_SIN_NUMBER;
-        	if(comboExport.getValue() != null)
-          		option = comboExport.getValue();
-           		//System.out.println("export = " + comboExport.getValue());
-           		switch(option){
-    	       	case SPACE_SIN_NUMBER:
-    	      		VertexPolygon.savePolygonSinNum_space(table.getItems());
-    	       		break;
-    	       	case SPACE_WITH_NUMBER:
-    	       		VertexPolygon.savePolygonWithNum_space(table.getItems());
-    	       		break;
-    	       	case COMMA_SIN_NUMBER:
-    	       		VertexPolygon.savePolygonSinNum_comma(table.getItems());
-    	       		break;
-    	   		case COMMA_WITH_NUMBER:
-    	   			VertexPolygon.savePolygonWithNum_comma(table.getItems());
-    	   			break;
-    	       	default:
-    	        		MessageBox.show("Choose file format.", "Insufficient information");
-    	        	}
-               	}else{
-               		MessageBox.show("The list is empty.", "Data error");
-        }
-    }
-    
-    private void addVertex(ActionEvent event){
-    	
-    	FOUND: {
-	    	Vertex v = new Vertex();
-	    	
-	    	if(textPointNum.getText().trim().length() < 1){
-	    		if(table.getItems() == null){
-	        		v.setNumber(1);
-	        	}else{
-	        		v.setNumber(table.getItems().size() + 1);
-	        	}
-	    	}else{
-	    		if(Integer.parseInt(textPointNum.getText()) < table.getItems().size()){
-	    			MessageBox.show("Number " + Integer.parseInt(textPointNum.getText()) + " is already taken", "Point Number Warning");
-	    			break FOUND;
-	    		}else{
-	    			v.setNumber(Integer.parseInt(textPointNum.getText()));
-	    		}
-	    	}
-	        if((textPointEast.getText().trim().length() > 0) & (textPointNorth.getText().trim().length() > 0)){
-	        	//v.setNumber(Integer.parseInt(textPointNum.getText()));
-	        	v.setEasting(Integer.parseInt(textPointEast.getText()));
-	        	v.setNorthing(Integer.parseInt(textPointNorth.getText()));
-	        	table.getItems().add(v);
-	        	textPointNum.clear();
-	        	textPointEast.clear();
-	        	textPointNorth.clear();
-	        	labelPointAdded.setStyle("-fx-text-fill: blue;");
-	        	labelPointAdded.setText("  OK!");
-	    	}else{
-	    		labelPointAdded.setStyle("-fx-text-fill: red;");
-	    		labelPointAdded.setText("Fail!");
-	    	}
-    	}
-    }
-    
-    	private void deleteVertex(ActionEvent event){
-    		ObservableList<Vertex> selected, vertexes;
-    		vertexes = table.getItems();
-    		selected = table.getSelectionModel().getSelectedItems();
-    		for(Vertex v: selected){
-    			vertexes.remove(v);
-    		}
-    	}
-    
-    
-    private void setArea(ActionEvent event){
-    	double sqMetres = calcArea(table.getItems());  // area is in square metres
-    	textCalcAreaFt2.setText(String.format("%.1f", sqMetres * 10.76391041671));
-    	textCalcAreaMetre2.setText(String.format("%.1f", sqMetres));
-    	textCalcAreaAcre.setText(String.format("%.2f", sqMetres * 0.000247105));
-    	textCalcAreaHa.setText(String.format("%.2f", sqMetres * 0.0001));
-    }
-    
-    private void setPerimeter(ActionEvent event){
-    	double metres = calcPerim(table.getItems());  // perimeter is in metres
-    	textCalcPerimFt.setText(String.format("%.1f", metres * 3.280840));
-    	textCalcPerimMetre.setText(String.format("%.1f", metres));
-    	textCalcPerimKm.setText(String.format("%.2f", metres / 1000));
-    	textCalcPerimMile.setText(String.format("%.2f", metres / 1609.3440));
-    	
-    }
-    
-    private double calcArea(ObservableList<Vertex> vertexesOL){  //calculates area in the same units
-    	labelPointAdded.setText("     ");
-    	//List<Vertex> vertexes = vertexesOL;					 //as in the table (metres)
-        int num = vertexesOL.size();  //number of vertexes
-        int last = num-1;
-        int x[] = new int[num];  //eastings of point number i
-        int y[] =  new int[num]; //northings of point number i
-        int i = 0;
-        double result = 0;
-        //System.out.println("num = " + num);
-        for(Vertex v: vertexesOL){
-        	//System.out.println(v.getNorthing());
-            x[i] = v.getEasting();
-            y[i] = v.getNorthing();
-            i++;
-        }
-        for(int n = 0; n < last; n++){
-            result = result + ((x[n]*y[n+1]) - (y[n]*x[n+1]));
-        }
-        result = (result + ((x[last]*y[0]) - (y[last]*x[0]))) * 0.5;
-        result = Math.abs(result);
-        return result;
-    }
-    
-    private double calcPerim(ObservableList<Vertex> vertexesOL){   //calculates perimeter in the same units
-    	labelPointAdded.setText("     ");
-    	//List<Vertex> vertexes = vertexesOL;					   //as in the table (metres)
-    	int num = vertexesOL.size();  //number of vertexes
-        int last = num-1;
-        int x[] = new int[num];  //eastings of point number i
-        int y[] =  new int[num]; //northings of point number i
-        int i = 0;
-        double result = 0;
-        for(Vertex v: vertexesOL){
-            x[i] = v.getEasting();
-            y[i] = v.getNorthing();
-            i++;
-        }
-        for(int n = 0; n < last; n++){
-            result = result + Math.sqrt(Math.pow((x[n] - x[n+1]) ,2) + Math.pow((y[n] - y[n+1]) ,2));
-        }
-        result = result + Math.sqrt(Math.pow((x[last] - x[0]) ,2) + Math.pow((y[last] - y[0]) ,2));
-        return result;
-    }
-    
-    
-    
-    
-    //============================= methods for scale conversion Tab A =============================================
-    
-    // converts fractional to all the others
+
+    /********************************* TabA methods *********************************/
+
+    /*
+     * Converts Fractional scale to all the others
+     */
     private void convertFra(){
     	try{
     		if((Long.parseLong(txtScaleFra.getText())) > 999999999L){
@@ -2241,17 +2042,14 @@ public class MapConverterFX extends Application {
 			    }
     		}
 	    } catch (NumberFormatException e){
-	    	if((txtScaleFra.getText().equals("Dustin")) || (txtScaleFra.getText().equals("dustin")) || (txtScaleFra.getText().equals("DUSTIN"))){
-	    		MessageBox2.show("Go and do something useful!", "Message for Dustin");
-	    		txtScaleFra.clear();
-	    	} else {
-	    		MessageBox.show("This is not a valid number", "Wrong scale format");
-	    		txtScaleFra.clear();
-	    	}
+    	    MessageBox.show("This is not a valid number", "Wrong scale format");
+    	    txtScaleFra.clear();
 	    }
     }
-    
-    //converts Imperial (inches to the mile) to all the others
+
+    /*
+     * Converts Imperial1 scale (inches to the Mile) to all the others
+     */
     private void convertIn(){
     	try{
     		if(txtScaleImpIn.getText().equals("0")){
@@ -2269,17 +2067,16 @@ public class MapConverterFX extends Application {
 		        }
     		}
     	} catch (NumberFormatException e){
-	    	if((txtScaleImpIn.getText().equals("Dustin")) || (txtScaleImpIn.getText().equals("dustin")) || (txtScaleImpIn.getText().equals("DUSTIN"))){
-	    		MessageBox2.show("Go and do something useful!", "Message for Dustin");
-	    		txtScaleImpIn.clear();
-	    	} else {
-	    		MessageBox.show("This is not a valid number", "Wrong number format");
-	    		txtScaleImpIn.clear();
-	    	}
+    	    MessageBox.show("This is not a valid number", "Wrong number format");
+    	    txtScaleImpIn.clear();
     	}
     }
-        
-    //converts Imperial (Miles to an inch) to all the others
+
+
+
+    /*
+     * Converts Imperial2 scale (Miles to an inch) to all the others
+     */
     private void convertMile(){
     	try{
     		if(txtScaleImpMile.getText().equals("0")){
@@ -2297,17 +2094,14 @@ public class MapConverterFX extends Application {
 		        }
     		}
     	} catch (NumberFormatException e){
-	    	if((txtScaleImpMile.getText().equals("Dustin")) || (txtScaleImpMile.getText().equals("dustin")) || (txtScaleImpMile.getText().equals("DUSTIN"))){
-	    		MessageBox2.show("Go and do something useful!", "Message for Dustin");
-	    		txtScaleImpMile.clear();
-	    	} else {
-	    		MessageBox.show("This is not a valid number", "Wrong number format");
-	    		txtScaleImpMile.clear();
-	    	}
+    	    MessageBox.show("This is not a valid number", "Wrong number format");
+    	    txtScaleImpMile.clear();
 	    }
     }
-        
-    //converts Metric (centimetres to a kilometre) to all the others
+
+    /*
+     * Converts Metric scale (centimetres to a kilometre) to all the others
+     */
     private void convertCm(){
     	try{
     		if(txtScaleMetricCm.getText().equals("0")){
@@ -2325,17 +2119,14 @@ public class MapConverterFX extends Application {
 		        }
     		}
     	} catch (NumberFormatException e){
-	    	if((txtScaleMetricCm.getText().equals("Dustin")) || (txtScaleMetricCm.getText().equals("dustin")) || (txtScaleMetricCm.getText().equals("DUSTIN"))){
-	    		MessageBox2.show("Go and do something useful!", "Message for Dustin");
-	    		txtScaleMetricCm.clear();
-	    	} else {
-	    		MessageBox.show("This is not a valid number", "Wrong number format");
-	    		txtScaleMetricCm.clear();
-	    	}
+    	    MessageBox.show("This is not a valid number", "Wrong number format");
+	    	txtScaleMetricCm.clear();
 	    }
     }
    
-	//converts Metric (cm to a km) to all the others
+    /*
+     * Converts Metric scale (kilometres to a cm) to all the others
+     */
     private void convertKm(){
     	try{
     		if(txtScaleMetricKm.getText().equals("0")){
@@ -2349,13 +2140,8 @@ public class MapConverterFX extends Application {
 		        resultKm.setText(txtScaleMetricKm.getText() + " km to a centimetre");
     		}
     	} catch (NumberFormatException e){
-	    	if((txtScaleMetricKm.getText().equals("Dustin")) || (txtScaleMetricKm.getText().equals("dustin")) || (txtScaleMetricKm.getText().equals("DUSTIN"))){
-	    		MessageBox2.show("Go and do something useful!", "Message for Dustin");
-	    		txtScaleMetricKm.clear();
-	    	} else {
-	    		MessageBox.show("This is not a valid number", "Wrong number format");
-	    		txtScaleMetricKm.clear();
-	    	}
+    	    MessageBox.show("This is not a valid number", "Wrong number format");
+	    	txtScaleMetricKm.clear();
 	    }
     }
     
@@ -2364,16 +2150,22 @@ public class MapConverterFX extends Application {
         resultFra.setText(""); resultIn.setText(""); resultMile.setText(""); resultCm.setText(""); resultKm.setText("");
     }
 
-	//=========================== methods for distance calculator TAB B ==============================
-    
-        
-  //temp variables/return values in milimetres
-    
+    /********************************* TabB methods *********************************/
+
+
+    /*
+     * !!! intermediate variables return values in milimetres !!!
+     */
+
+
     private double mapDist;
     private double groundDist;
     private double mapScale;
-    int count = 0;
-    
+    int count = 0; // supposed to help to recognize when 2 out of 3 needed fields are filled in but abandoned for now
+
+    /*
+     * Reads map distance measurement and returns value in milimetres
+     */
     private double getMapDist(){
         if(!(txtMm.getText().equals(null)) & !(txtMm.getText().equals("")) & (!txtMm.getText().equals("0"))){
             count++;
@@ -2390,7 +2182,10 @@ public class MapConverterFX extends Application {
             return 0;
         }
     }
-    
+
+    /*
+     * Reads ground distance measurement and returns value in milimetres
+     */
     private double getGroundDist(){
         if(!(txtKm.getText().equals(null)) & !(txtKm.getText().equals("")) & (!txtKm.getText().equals("0"))){
             count++;
@@ -2415,7 +2210,10 @@ public class MapConverterFX extends Application {
             return 0;
         }
     }
-    
+
+    /*
+     * Reads map scale and returns Fractional scale value
+     */
     private double getScale(){
         if(txtScaleFractional.getText().length() > 0){
         	count++;
@@ -2441,7 +2239,10 @@ public class MapConverterFX extends Application {
             return 0;
         }
     }
-    
+
+    /*
+     * Checks if 2 out of 3 fields necessary for calculations in this Tab (TabB) are present and valid
+     */
     private boolean validateInput(){
     	mapDist = getMapDist();
         groundDist = getGroundDist();
@@ -2453,7 +2254,12 @@ public class MapConverterFX extends Application {
     		return true;
     	}
     }
-    
+
+    /*
+     * Validates input and disttributes calculations to the methods depending
+     * what the entry parameters are (2 out of 3) and sets the results to all
+     * remaining fields
+     */
     private void calculate(){
     	if(validateInput()){
             if((mapDist != 0) & (groundDist != 0)){
@@ -2472,7 +2278,8 @@ public class MapConverterFX extends Application {
             }
             count = 0;
         } else {
-            MessageBox.show("Two out of the three columns must have a field with a value. One column has to remain empty", "Wrong input format");
+            MessageBox.show("Two out of the three columns must have a field with a value. " +
+                    "One column has to remain empty", "Wrong input format");
         }
     }
     
@@ -2481,7 +2288,10 @@ public class MapConverterFX extends Application {
     	setGroundFields();
     	setScaleFields();
     }
-    
+
+    /*
+     * sets calculated values to map distance fields
+     */
     private void setMapFields(){
     	if(mapDist > 99999999){
         	lblGap1a.setText("more than 99,999,999 mm");
@@ -2497,7 +2307,10 @@ public class MapConverterFX extends Application {
         txtCm.setText(String.format("%.2f", (mapDist / 10)));
         txtIn.setText(String.format("%.2f", (mapDist / 25.4)));
     }
-    
+
+    /*
+     * sets calculated values to ground distance fields
+     */
     private void setGroundFields(){
         txtKm.setText(String.format("%.3f", (groundDist / 1000000)));
         txtMetre.setText(String.format("%.1f", (groundDist / 1000)));
@@ -2505,7 +2318,10 @@ public class MapConverterFX extends Application {
         txtFt.setText(String.format("%.1f", (groundDist / 304.8)));
         txtYard.setText(String.format("%.1f", (groundDist / 914.4)));
     }
-    
+
+    /*
+     * sets calculated values to map scale fields
+     */
     private void setScaleFields(){
     	    if(mapScale < 1){
             	lblGap3a.setText("bigger than 1 : 1");
@@ -2520,8 +2336,6 @@ public class MapConverterFX extends Application {
             		txtScaleFractional.setText(NumberFormat.getIntegerInstance().format((int) mapScale));
             	}
             }
-        //txtScaleFractional.setText(String.format("%.0f", mapScale));
-    	    
     	    if((63360 / mapScale) < 0.1){
             	lblGap3b.setText("less than 0.1 inch to the mile");
             	lblGap3b.setStyle("-fx-font-family: \"Arial\"; -fx-font-size: 11; -fx-text-fill: red;");
@@ -2543,7 +2357,6 @@ public class MapConverterFX extends Application {
         }else{
         	txtScaleCm.setText(String.format("%.1f", (100000 / mapScale)));
         }
-        
         if((mapScale / 100000) < 0.001){
         	lblGap3e.setText("less than 0.001 km to a cm");
         	lblGap3e.setStyle("-fx-font-family: \"Arial\"; -fx-font-size: 11; -fx-text-fill: red;");
@@ -2561,18 +2374,19 @@ public class MapConverterFX extends Application {
     	lblGap3a.setText(""); lblGap3b.setText(""); lblGap3c.setText(""); lblGap3d.setText(""); lblGap3e.setText("");
     	count = 0;
     }
-    
-    
-	//=========================== methods for coordinate converter TAB C ==============================
+
+
+    /********************************* TabC methods *********************************/
     
     Point pointL = new Point();
 	Point pointR = new Point();
 	Distance distance = new Distance();
 	BearingPolygon polygon = new BearingPolygon();
 	boolean hasDecimal = true;
-    
-	//------------------- Distance & Bearing---------------------------------------------
-	
+
+    /*
+     * Distance and Bearing calculations
+     */
     private void convertAndSetDistanceTabC(ActionEvent e){
     	if((textDistKm.getText().trim().length() > 0) & (textDistMilesStatue.getText().trim().length() > 0)
     			& (textDistMilesNautical.getText().trim().length() > 0) & (textDistMetres.getText().trim().length() > 0) &
@@ -2620,7 +2434,6 @@ public class MapConverterFX extends Application {
     			MessageBox.show("Please set both points", "Insufficient input error");
     		}
     	}
-    	
     }
     
     private void calculateSetAzimuthBearing(ActionEvent event){
@@ -2664,33 +2477,35 @@ public class MapConverterFX extends Application {
 		textDistMetres.clear();
 		textDistFt.clear();
 	}
-	
-	//-------------------- Left Point -----------------------------------------------
-	
+
+    /*
+     * Left Point calculations
+     */
 	private void readLeftPoint(ActionEvent event){   //decide which fields to use as input
 		if(textLeftOsSixFigure.getText().trim().length() != 0){
 			calcLeftFromOSSixFigure();
-			//System.out.println(pointL.getEasting());
-			//labelLeftPoint.setStyle("-fx-font: 13 arial; -fx-text-fill: blue;");
 		}else{
-			if((textLeftOSEast.getText().trim().length() > 0) || (textLeftOSNorth.getText().trim().length() > 0)){
+			if((textLeftOSEast.getText().trim().length() > 0)
+                    || (textLeftOSNorth.getText().trim().length() > 0)){
 				calcLeftFromOS();
-				//labelLeftPoint.setStyle("-fx-font: 13 arial; -fx-text-fill: blue;");
 			}else{
-				if((textLeftWGS84_degDec_Lat.getText().trim().length() > 0) || (textLeftWGS84_degDec_Lon.getText().trim().length() > 0)){
+				if((textLeftWGS84_degDec_Lat.getText().trim().length() > 0)
+                        || (textLeftWGS84_degDec_Lon.getText().trim().length() > 0)){
 					calcLeftFromDegDec();
-					//labelLeftPoint.setStyle("-fx-font: 13 arial; -fx-text-fill: blue;");
 				}else{
-					if((textLeftWGS84_degDecMin_Lat.getText().trim().length() > 0) || (textLeftWGS84_minDecMin_Lat.getText().trim().length() > 0)
-					|| (textLeftWGS84_degDecMin_Lon.getText().trim().length() > 0) || (textLeftWGS84_minDecMin_Lon.getText().trim().length() > 0)){
+					if((textLeftWGS84_degDecMin_Lat.getText().trim().length() > 0)
+                            || (textLeftWGS84_minDecMin_Lat.getText().trim().length() > 0)
+					        || (textLeftWGS84_degDecMin_Lon.getText().trim().length() > 0)
+                            || (textLeftWGS84_minDecMin_Lon.getText().trim().length() > 0)){
 					calcLeftFromMinDec();
-					//labelLeftPoint.setStyle("-fx-font: 13 arial; -fx-text-fill: blue;");
 					}else{
-						if((textLeftWGS84_degDecSec_Lat.getText().trim().length() > 0) || (textLeftWGS84_degDecSec_Lon.getText().trim().length() > 0)
-								|| (textLeftWGS84_minDecSec_Lat.getText().trim().length() > 0) || (textLeftWGS84_minDecSec_Lon.getText().trim().length() > 0)
-								|| (textLeftWGS84_secDecSec_Lat.getText().trim().length() > 0) || (textLeftWGS84_secDecSec_Lon.getText().trim().length() > 0)){
+						if((textLeftWGS84_degDecSec_Lat.getText().trim().length() > 0)
+                                || (textLeftWGS84_degDecSec_Lon.getText().trim().length() > 0)
+								|| (textLeftWGS84_minDecSec_Lat.getText().trim().length() > 0)
+                                || (textLeftWGS84_minDecSec_Lon.getText().trim().length() > 0)
+								|| (textLeftWGS84_secDecSec_Lat.getText().trim().length() > 0)
+                                || (textLeftWGS84_secDecSec_Lon.getText().trim().length() > 0)){
 							calcLeftFromSecDec();	
-							//labelLeftPoint.setStyle("-fx-font: 13 arial; -fx-text-fill: blue;");
 						}else{
 							MessageBox.show("No location for the left point", "Input error");
 						}
@@ -2700,7 +2515,7 @@ public class MapConverterFX extends Application {
 		}
 	}
 	
-	private void calcLeftFromOSSixFigure(){        //when user enters six-figure OS reference
+	private void calcLeftFromOSSixFigure(){ //when user enters six-figure OS reference
 		try{
 			pointL.setOsSixFigure(textLeftOsSixFigure.getText().replaceAll(" ", ""));
 			pointL.setLatLonFromOSSixFigure();
@@ -2710,23 +2525,29 @@ public class MapConverterFX extends Application {
 		}
 	}
 			
-	private void calcLeftFromOS(){			//when user enters easting and northing
+	private void calcLeftFromOS(){  //when user enters easting and northing
 		if((textLeftOSEast.getText().trim().length() != 0) & (textLeftOSNorth.getText().trim().length() != 0)){
 			pointL.setEasting(getOSFromText(textLeftOSEast.getText()));
 			pointL.setNorthing(getOSFromText(textLeftOSNorth.getText()));
-			if(pointL.getEasting() >0 & pointL.getEasting() < 1500000 & pointL.getNorthing() > 0 & pointL.getNorthing() < 1800000){
+			if(pointL.getEasting() >0
+                    & pointL.getEasting() < 1500000
+                    & pointL.getNorthing() > 0
+                    & pointL.getNorthing() < 1800000){
 				pointL.setLatLonFromEastNorth();
 				setLeftPointAll();
 			}else{
-				MessageBox.show("Easting has to be between 0 and 1 5000 000 and Northing has to be between 0 and 1 800 000", "Input error");
+				MessageBox.show("Easting has to be between 0 and 1 5000 000 and Northing" +
+                        " has to be between 0 and 1 800 000", "Input error");
 			}
 		}else{
-			MessageBox.show("Both Easting and Northing have to be entered", "Insufficient input error");
+			MessageBox.show("Both Easting and Northing have to be entered",
+                    "Insufficient input error");
 		}
 	}
 	
-	private void calcLeftFromDegDec(){      //when user enters latitude and longitude (decimal degrees)
-		if((textLeftWGS84_degDec_Lat.getText().trim().length() != 0) & (textLeftWGS84_degDec_Lon.getText().trim().length() != 0)){
+	private void calcLeftFromDegDec(){  // when user enters latitude and longitude (decimal degrees)
+		if((textLeftWGS84_degDec_Lat.getText().trim().length() != 0)
+                & (textLeftWGS84_degDec_Lon.getText().trim().length() != 0)){
 			pointL.setLatDegreesDecDeg(Double.parseDouble(textLeftWGS84_degDec_Lat.getText()));
 			pointL.setLonDegreesDecDeg(Double.parseDouble(textLeftWGS84_degDec_Lon.getText()));
 			pointL.setLatLonFromDegDec();
@@ -2735,17 +2556,20 @@ public class MapConverterFX extends Application {
 				pointL.setEastNorthFromLatLon();
 				setLeftPointAll();
 			}else{
-				MessageBox.show("Both Latitude and Longitude have to be between -90 na 90 degrees", "Out of range");
+				MessageBox.show("Both Latitude and Longitude have to be between -90 na 90 degrees",
+                        "Out of range");
 			}
 		}else{
-			MessageBox.show("Both Longitude and Latitude have to be entered", "Insufficient input error");
+			MessageBox.show("Both Longitude and Latitude have to be entered",
+                    "Insufficient input error");
 		}
 	}
 	
-	private void calcLeftFromMinDec(){      //when user enters latitude and longitude (decimal minutes)
-		if((textLeftWGS84_degDecMin_Lat.getText().trim().length() != 0) & (textLeftWGS84_degDecMin_Lon.getText().trim().length() != 0)
-				& (textLeftWGS84_minDecMin_Lat.getText().trim().length() != 0) & (textLeftWGS84_minDecMin_Lon.getText().trim().length() != 0)){
-			
+	private void calcLeftFromMinDec(){  // when user enters latitude and longitude (decimal minutes)
+		if((textLeftWGS84_degDecMin_Lat.getText().trim().length() != 0)
+                & (textLeftWGS84_degDecMin_Lon.getText().trim().length() != 0)
+				& (textLeftWGS84_minDecMin_Lat.getText().trim().length() != 0)
+                & (textLeftWGS84_minDecMin_Lon.getText().trim().length() != 0)){
 			pointL.setLatMinutesDecDeg(Integer.parseInt(textLeftWGS84_degDecMin_Lat.getText()));
 			pointL.setLatMinutesDecMin(Double.parseDouble(textLeftWGS84_minDecMin_Lat.getText()));
 			pointL.setLonMinutesDecDeg(Integer.parseInt(textLeftWGS84_degDecMin_Lon.getText()));
@@ -2756,17 +2580,22 @@ public class MapConverterFX extends Application {
 				pointL.setEastNorthFromLatLon();
 				setLeftPointAll();
 			}else{
-				MessageBox.show("Both Latitude and Longitude have to be between -90 na 90 degrees", "Out of range");
+				MessageBox.show("Both Latitude and Longitude have to be between -90 na 90 degrees",
+                        "Out of range");
 			}
 		}else{
-			MessageBox.show("Both Longitude and Latitude have to be entered", "Insufficient input error");
+			MessageBox.show("Both Longitude and Latitude have to be entered",
+                    "Insufficient input error");
 		}
 	}
 	
-	private void calcLeftFromSecDec(){      //when user enters latitude and longitude (decimal seconds-)
-		if((textLeftWGS84_degDecSec_Lat.getText().trim().length() != 0) & (textLeftWGS84_degDecSec_Lon.getText().trim().length() != 0)
-				& (textLeftWGS84_minDecSec_Lat.getText().trim().length() != 0) & (textLeftWGS84_minDecSec_Lon.getText().trim().length() != 0)
-				& (textLeftWGS84_secDecSec_Lat.getText().trim().length() != 0) & (textLeftWGS84_secDecSec_Lon.getText().trim().length() != 0)){
+	private void calcLeftFromSecDec(){  // when user enters latitude and longitude (decimal seconds-)
+		if((textLeftWGS84_degDecSec_Lat.getText().trim().length() != 0)
+                & (textLeftWGS84_degDecSec_Lon.getText().trim().length() != 0)
+				& (textLeftWGS84_minDecSec_Lat.getText().trim().length() != 0)
+                & (textLeftWGS84_minDecSec_Lon.getText().trim().length() != 0)
+				& (textLeftWGS84_secDecSec_Lat.getText().trim().length() != 0)
+                & (textLeftWGS84_secDecSec_Lon.getText().trim().length() != 0)){
 			pointL.setLatSecondsDecDeg(Integer.parseInt(textLeftWGS84_degDecSec_Lat.getText()));
 			pointL.setLatSecondsDecMin(Integer.parseInt(textLeftWGS84_minDecSec_Lat.getText()));
 			pointL.setLatSecondsDecSec(Double.parseDouble(textLeftWGS84_secDecSec_Lat.getText()));
@@ -2779,10 +2608,12 @@ public class MapConverterFX extends Application {
 				pointL.setEastNorthFromLatLon();
 				setLeftPointAll();
 			}else{
-				MessageBox.show("Both Latitude and Longitude have to be between -90 na 90 degrees", "Out of range");
+				MessageBox.show("Both Latitude and Longitude have to be between -90 na 90 degrees",
+                        "Out of range");
 			}
 		}else{
-			MessageBox.show("Both Longitude and Latitude have to be entered", "Insufficient input error");
+			MessageBox.show("Both Longitude and Latitude have to be entered",
+                    "Insufficient input error");
 		}
 	}
 				
@@ -2792,14 +2623,9 @@ public class MapConverterFX extends Application {
 		if((pointL.getEasting() > 0) & (pointL.getEasting() < 1500000)
 				& (pointL.getNorthing() > 0) & (pointL.getNorthing() < 1800000)){
 			textLeftOSEast.setText((new Integer((int)pointL.getEasting())).toString());
-			//textLeftOSNorth.setText(String.format("%.2f", pointL.getNorthing()));
 			textLeftOSNorth.setText((new Integer((int)pointL.getNorthing())).toString());
 			textLeftOsSixFigure.setText(pointL.getOsSixFigure());
 		}else{
-		/*	labelLeftOSEast.setText("out of range");
-			labelLeftOSEast.setStyle("-fx-text-fill: limegreen;");
-			labelLeftOSNorth.setText("out of range");
-			labelLeftOSNorth.setStyle("-fx-text-fill: limegreen;");  */
 			textLeftOSEast.setPromptText("out of range");
 			textLeftOSNorth.setPromptText("out of range");
 			textLeftOsSixFigure.setPromptText("out of range");
@@ -2813,8 +2639,7 @@ public class MapConverterFX extends Application {
 		textLeftWGS84_degDecSec_Lat.setText((new Integer(pointL.getLatSecondsDecDeg())).toString());
 		textLeftWGS84_minDecSec_Lat.setText((new Integer(pointL.getLatSecondsDecMin())).toString());
 		textLeftWGS84_secDecSec_Lat.setText(String.format("%.2f", pointL.getLatSecondsDecSec()));
-		
-		
+
 		textLeftWGS84_degDec_Lon.setText(String.format("%.10f", pointL.getLonDegreesDecDeg()));
 		
 		textLeftWGS84_degDecMin_Lon.setText((new Integer(pointL.getLonMinutesDecDeg())).toString());
@@ -2962,32 +2787,35 @@ public class MapConverterFX extends Application {
 		pointL.clearCoords();
 		labelPointSubmittedLeft.setStyle("-fx-text-fill: grey;"); // label from Tab D
 	}
-	
-	//-------------------- Right Point -----------------------------------------------
-		
+
+    /*
+     * Right Point calculations
+     */
 		private void readRightPoint(ActionEvent event){
 			if(textRightOsSixFigure.getText().trim().length() != 0){
 				calcRightFromOSSixFigure();
-				//labelRightPoint.setStyle("-fx-font: 13 arial; -fx-text-fill: blue;");
 			}else{
-				if(textRightOSEast.getText().trim().length() > 0 || (textRightOSNorth.getText().trim().length() > 0)){
+				if(textRightOSEast.getText().trim().length() > 0
+                        || (textRightOSNorth.getText().trim().length() > 0)){
 					calcRightFromOS();
-					//labelRightPoint.setStyle("-fx-font: 13 arial; -fx-text-fill: blue;");
 				}else{
-					if((textRightWGS84_degDec_Lat.getText().trim().length() > 0) || (textRightWGS84_degDec_Lon.getText().trim().length() > 0)){
+					if((textRightWGS84_degDec_Lat.getText().trim().length() > 0)
+                            || (textRightWGS84_degDec_Lon.getText().trim().length() > 0)){
 						calcRightFromDegDec();
-						//labelRightPoint.setStyle("-fx-font: 13 arial; -fx-text-fill: blue;");
 					}else{
-						if((textRightWGS84_degDecMin_Lat.getText().trim().length() > 0) || (textRightWGS84_minDecMin_Lat.getText().trim().length() > 0)
-						|| (textRightWGS84_degDecMin_Lon.getText().trim().length() > 0) || (textRightWGS84_minDecMin_Lon.getText().trim().length() > 0)){
+						if((textRightWGS84_degDecMin_Lat.getText().trim().length() > 0)
+                                || (textRightWGS84_minDecMin_Lat.getText().trim().length() > 0)
+						        || (textRightWGS84_degDecMin_Lon.getText().trim().length() > 0)
+                                || (textRightWGS84_minDecMin_Lon.getText().trim().length() > 0)){
 						calcRightFromMinDec();
-						//labelRightPoint.setStyle("-fx-font: 13 arial; -fx-text-fill: blue;");
 						}else{
-							if((textRightWGS84_degDecSec_Lat.getText().trim().length() > 0) || (textRightWGS84_degDecSec_Lon.getText().trim().length() > 0)
-									|| (textRightWGS84_minDecSec_Lat.getText().trim().length() > 0) || (textRightWGS84_minDecSec_Lon.getText().trim().length() > 0)
-									|| (textRightWGS84_secDecSec_Lat.getText().trim().length() > 0) || (textRightWGS84_secDecSec_Lon.getText().trim().length() > 0)){
+							if((textRightWGS84_degDecSec_Lat.getText().trim().length() > 0)
+                                    || (textRightWGS84_degDecSec_Lon.getText().trim().length() > 0)
+									|| (textRightWGS84_minDecSec_Lat.getText().trim().length() > 0)
+                                    || (textRightWGS84_minDecSec_Lon.getText().trim().length() > 0)
+									|| (textRightWGS84_secDecSec_Lat.getText().trim().length() > 0)
+                                    || (textRightWGS84_secDecSec_Lon.getText().trim().length() > 0)){
 								calcRightFromSecDec();
-								//labelRightPoint.setStyle("-fx-font: 13 arial; -fx-text-fill: blue;");
 							}else{
 								MessageBox.show("No location for the right point", "Input error");
 							}
@@ -2997,7 +2825,7 @@ public class MapConverterFX extends Application {
 			}
 		}
 		
-		private void calcRightFromOSSixFigure(){        //when user enters six-figure OS reference
+		private void calcRightFromOSSixFigure(){  // when user enters six-figure OS reference
 			try{
 				pointR.setOsSixFigure(textRightOsSixFigure.getText().trim().replaceAll(" ", ""));
 				pointR.setLatLonFromOSSixFigure();
@@ -3007,63 +2835,83 @@ public class MapConverterFX extends Application {
 			}
 		}		
 			
-		private void calcRightFromOS(){		//when user enters easting and northing
-			if((textRightOSEast.getText().trim().length() != 0) & (textRightOSNorth.getText().trim().length() != 0)){
+		private void calcRightFromOS(){	// when user enters easting and northing
+			if((textRightOSEast.getText().trim().length() != 0)
+                    & (textRightOSNorth.getText().trim().length() != 0)){
 				pointR.setEasting(getOSFromText(textRightOSEast.getText()));
 				pointR.setNorthing(getOSFromText(textRightOSNorth.getText()));
-				if(pointR.getEasting() > 0 & pointR.getEasting() < 1500000 & pointR.getNorthing() > 0 & pointR.getNorthing() < 1800000){
+				if(pointR.getEasting() > 0
+                        & pointR.getEasting() < 1500000
+                        & pointR.getNorthing() > 0
+                        & pointR.getNorthing() < 1800000){
 					pointR.setLatLonFromEastNorth();
 					setRightPointAll();
 				}else{
-					MessageBox.show("Easting has to be between 0 and 1 500 000 and Northing has to be between 0 and 1 800 000", "Input error");
+					MessageBox.show("Easting has to be between 0 and 1 500 000 and Northing " +
+                            "has to be between 0 and 1 800 000", "Input error");
 				}
 			}else{
-				MessageBox.show("Both Easting and Northing have to be entered", "Insuficient input error");
+				MessageBox.show("Both Easting and Northing have to be entered",
+                        "Insuficient input error");
 			}
 		}
 		
-		private void calcRightFromDegDec(){      //when user enters latitude and longitude (decimal degrees)
-			if((textRightWGS84_degDec_Lat.getText().trim().length() != 0) & (textRightWGS84_degDec_Lon.getText().trim().length() != 0)){
+		private void calcRightFromDegDec(){  // when user enters latitude and longitude (decimal degrees)
+			if((textRightWGS84_degDec_Lat.getText().trim().length() != 0)
+                    & (textRightWGS84_degDec_Lon.getText().trim().length() != 0)){
 				pointR.setLatDegreesDecDeg(Double.parseDouble(textRightWGS84_degDec_Lat.getText()));
 				pointR.setLonDegreesDecDeg(Double.parseDouble(textRightWGS84_degDec_Lon.getText()));
 				pointR.setLatLonFromDegDec();
-				if((pointR.getLatDegreesDecDeg() >= -90) & (pointR.getLatDegreesDecDeg() <= 90)
-						& (pointR.getLonDegreesDecDeg() >= -90) & (pointR.getLonDegreesDecDeg() <= 90)){
+				if((pointR.getLatDegreesDecDeg() >= -90)
+                        & (pointR.getLatDegreesDecDeg() <= 90)
+						& (pointR.getLonDegreesDecDeg() >= -90)
+                        & (pointR.getLonDegreesDecDeg() <= 90)){
 					pointR.setEastNorthFromLatLon();
 					setRightPointAll();
 				}else{
-					MessageBox.show("Both Latitude and Longitude have to be between -90 na 90 degrees", "Out of range");
+					MessageBox.show("Both Latitude and Longitude have to be between -90 na 90 degrees",
+                            "Out of range");
 				}
 			}else{
-				MessageBox.show("Both Longitude and Latitude have to be entered", "Insufficient input error");
+				MessageBox.show("Both Longitude and Latitude have to be entered",
+                        "Insufficient input error");
 			}
 		}
 		
-		private void calcRightFromMinDec(){      //when user enters latitude and longitude (decimal minutes)
-			if((textRightWGS84_degDecMin_Lat.getText().trim().length() != 0) & (textRightWGS84_degDecMin_Lon.getText().trim().length() != 0)
-					& (textRightWGS84_minDecMin_Lat.getText().trim().length() != 0) & (textRightWGS84_minDecMin_Lon.getText().trim().length() != 0)){
+		private void calcRightFromMinDec(){ // when user enters latitude and longitude (decimal minutes)
+			if((textRightWGS84_degDecMin_Lat.getText().trim().length() != 0)
+                    & (textRightWGS84_degDecMin_Lon.getText().trim().length() != 0)
+					& (textRightWGS84_minDecMin_Lat.getText().trim().length() != 0)
+                    & (textRightWGS84_minDecMin_Lon.getText().trim().length() != 0)){
 				
 				pointR.setLatMinutesDecDeg(Integer.parseInt(textRightWGS84_degDecMin_Lat.getText()));
 				pointR.setLatMinutesDecMin(Double.parseDouble(textRightWGS84_minDecMin_Lat.getText()));
 				pointR.setLonMinutesDecDeg(Integer.parseInt(textRightWGS84_degDecMin_Lon.getText()));
 				pointR.setLonMinutesDecMin(Double.parseDouble(textRightWGS84_minDecMin_Lon.getText()));
 				pointR.setLatLonFromMinDec();
-				if((pointR.getLatDegreesDecDeg() >= -90) & (pointR.getLatDegreesDecDeg() <= 90)
-						& (pointR.getLonDegreesDecDeg() >= -90) & (pointR.getLonDegreesDecDeg() <= 90)){
+				if((pointR.getLatDegreesDecDeg() >= -90)
+                        & (pointR.getLatDegreesDecDeg() <= 90)
+						& (pointR.getLonDegreesDecDeg() >= -90)
+                        & (pointR.getLonDegreesDecDeg() <= 90)){
 					pointR.setEastNorthFromLatLon();
 					setRightPointAll();
 				}else{
-					MessageBox.show("Both Latitude and Longitude have to be between -90 na 90 degrees", "Out of range");
+					MessageBox.show("Both Latitude and Longitude have to be between -90 na 90 degrees",
+                            "Out of range");
 				}
 			}else{
-				MessageBox.show("Both Longitude and Latitude have to be entered", "Insufficient input error");
+				MessageBox.show("Both Longitude and Latitude have to be entered",
+                        "Insufficient input error");
 			}
 		}
 		
-		private void calcRightFromSecDec(){      //when user enters latitude and longitude (decimal seconds-)
-			if((textRightWGS84_degDecSec_Lat.getText().trim().length() != 0) & (textRightWGS84_degDecSec_Lon.getText().trim().length() != 0)
-					& (textRightWGS84_minDecSec_Lat.getText().trim().length() != 0) & (textRightWGS84_minDecSec_Lon.getText().trim().length() != 0)
-					& (textRightWGS84_secDecSec_Lat.getText().trim().length() != 0) & (textRightWGS84_secDecSec_Lon.getText().trim().length() != 0)){
+		private void calcRightFromSecDec(){  // when user enters latitude and longitude (decimal seconds-)
+			if((textRightWGS84_degDecSec_Lat.getText().trim().length() != 0)
+                    & (textRightWGS84_degDecSec_Lon.getText().trim().length() != 0)
+					& (textRightWGS84_minDecSec_Lat.getText().trim().length() != 0)
+                    & (textRightWGS84_minDecSec_Lon.getText().trim().length() != 0)
+					& (textRightWGS84_secDecSec_Lat.getText().trim().length() != 0)
+                    & (textRightWGS84_secDecSec_Lon.getText().trim().length() != 0)){
 				pointR.setLatSecondsDecDeg(Integer.parseInt(textRightWGS84_degDecSec_Lat.getText()));
 				pointR.setLatSecondsDecMin(Integer.parseInt(textRightWGS84_minDecSec_Lat.getText()));
 				pointR.setLatSecondsDecSec(Double.parseDouble(textRightWGS84_secDecSec_Lat.getText()));
@@ -3071,15 +2919,19 @@ public class MapConverterFX extends Application {
 				pointR.setLonSecondsDecMin(Integer.parseInt(textRightWGS84_minDecSec_Lon.getText()));
 				pointR.setLonSecondsDecSec(Double.parseDouble(textRightWGS84_secDecSec_Lon.getText()));
 				pointR.setLatLonFromSecDec();
-				if((pointR.getLatDegreesDecDeg() >= -90) & (pointR.getLatDegreesDecDeg() <= 90)
-						& (pointR.getLonDegreesDecDeg() >= -90) & (pointR.getLonDegreesDecDeg() <= 90)){
+				if((pointR.getLatDegreesDecDeg() >= -90)
+                        & (pointR.getLatDegreesDecDeg() <= 90)
+						& (pointR.getLonDegreesDecDeg() >= -90)
+                        & (pointR.getLonDegreesDecDeg() <= 90)){
 					pointR.setEastNorthFromLatLon();
 					setRightPointAll();
 				}else{
-					MessageBox.show("Both Latitude and Longitude have to be between -90 na 90 degrees", "Out of range");
+					MessageBox.show("Both Latitude and Longitude have to be between -90 na 90 degrees",
+                            "Out of range");
 				}
 			}else{
-				MessageBox.show("Both Longitude and Latitude have to be entered", "Insufficient input error");
+				MessageBox.show("Both Longitude and Latitude have to be entered",
+                        "Insufficient input error");
 			}
 		}
 		
@@ -3087,7 +2939,6 @@ public class MapConverterFX extends Application {
 			
 			labelRightPoint.setStyle("-fx-font: 13 arial; -fx-text-fill: blue;");
 			
-			//System.out.println(pointR.getEasting());
 			if(((int)pointR.getEasting() > 0) & ((int)pointR.getEasting() < 1500000)
 					& ((int)pointR.getNorthing() > 0) & ((int)pointR.getNorthing() < 1800000)){
 				textRightOSEast.setText((new Integer((int)pointR.getEasting())).toString());
@@ -3095,10 +2946,6 @@ public class MapConverterFX extends Application {
 				textRightOsSixFigure.setText(pointR.getOsSixFigure());
 				
 			}else{
-				/*textRightOSEast.setText("out of range");
-				textRightOSEast.setStyle("-fx-text-fill: limegreen;");
-				textRightOSNorth.setText("out of range");
-				textRightOSNorth.setStyle("-fx-text-fill: limegreen;");  */
 				textRightOSEast.setPromptText("out of range");
 				textRightOSNorth.setPromptText("out of range");
 				textRightOsSixFigure.setPromptText("out of range");
@@ -3262,66 +3109,258 @@ public class MapConverterFX extends Application {
 			pointR.clearCoords();
 			labelPointSubmittedRight.setStyle("-fx-text-fill: grey;"); // label from Tab D
 		}
-		
-	
-	
-	//----------------------------------- general for points -----------------------------------
-    
+
+
+    /*
+     * General for both poins, check if OS grid reference is integer
+     */
 	private double getOSFromText(String stringOS){
 		double gridRef = 0;
 		gridRef = Double.parseDouble(stringOS);
 		if(gridRef % 1 == 0)
 			hasDecimal = false;
 		return gridRef;
-	} 
-    
+	}
+
+
+    /********************************* TabD methods *********************************/
+
+
+    private void clearAreaFields(){
+        textCalcAreaFt2.clear();
+        textCalcAreaMetre2.clear();
+        textCalcAreaAcre.clear();
+        textCalcAreaHa.clear();
+    }
+
+    private void clearPerimFields(){
+        textCalcPerimFt.clear();
+        textCalcPerimMetre.clear();
+        textCalcPerimKm.clear();
+        textCalcPerimMile.clear();
+    }
+
+    /*
+     * Submits selected point as Left Point to TabC
+     */
+    private void selectLeftPoint(ActionEvent event){
+        if(table.getSelectionModel().getSelectedItem() != null){
+            textLeftOSEast.setText(Integer.toString(table.getSelectionModel().getSelectedItem().getEasting()));
+            textLeftOSNorth.setText(Integer.toString(table.getSelectionModel().getSelectedItem().getNorthing()));
+            labelPointSubmittedLeft.setStyle("-fx-text-fill: blue;");
+        }
+    }
+
+    /*
+     * Submits selected point as Right Point to TabC
+     */
+    private void selectRightPoint(ActionEvent event){
+        if(table.getSelectionModel().getSelectedItem() != null){
+            textRightOSEast.setText(Integer.toString(table.getSelectionModel().getSelectedItem().getEasting()));
+            textRightOSNorth.setText(Integer.toString(table.getSelectionModel().getSelectedItem().getNorthing()));
+            labelPointSubmittedRight.setStyle("-fx-text-fill: blue;");
+        }
+    }
+
+    /*
+     * Points/Polygon Table section
+     */
+    private void colNum_onEditCommit(Event e){
+        TableColumn.CellEditEvent<Vertex, Integer> ce;
+        ce = (TableColumn.CellEditEvent<Vertex, Integer>) e;
+        Vertex v = ce.getRowValue();
+        v.setNumber(ce.getNewValue());
+    }
+
+    private void colEast_onEditCommit(Event e){
+        TableColumn.CellEditEvent<Vertex, Integer> ce;
+        ce = (TableColumn.CellEditEvent<Vertex, Integer>) e;
+        Vertex v = ce.getRowValue();
+        v.setEasting(ce.getNewValue());
+    }
+
+    private void colNorth_onEditCommit(Event e){
+        TableColumn.CellEditEvent<Vertex, Integer> ce;
+        ce = (TableColumn.CellEditEvent<Vertex, Integer>) e;
+        Vertex v = ce.getRowValue();
+        v.setNorthing(ce.getNewValue());
+    }
+
+    /*
+     * Imports points to the table
+     */
+    private void importVertexes(ActionEvent event){
+        try{
+            labelPointAdded.setText("     ");
+            String option;
+            if(comboImport.getValue() != null){
+                option = comboImport.getValue();
+                switch(option){
+                    case SPACE_SIN_NUMBER:
+                        table.getItems().setAll(VertexPolygon.readPolygonSinNum_space());
+                        break;
+                    case SPACE_WITH_NUMBER:
+                        table.getItems().setAll(VertexPolygon.readPolygonWithNum_space());
+                        break;
+                    case COMMA_SIN_NUMBER:
+                        table.getItems().setAll(VertexPolygon.readPolygonSinNum_comma());
+                        break;
+                    case COMMA_WITH_NUMBER:
+                        table.getItems().setAll(VertexPolygon.readPolygonWithNum_comma());
+                        break;
+                    default:
+                        MessageBox.show("Choose file format", "Insufficient information");
+                }
+            }else{
+                MessageBox.show("Choose file format", "Insufficient information");
+            }
+        }catch(NumberFormatException e){
+            MessageBox.show("Declared file format does not match the actual file format", "Input error");
+        }
+    }
+
+    /*
+     * Exports points from table
+     */
+    private void exportVertexes(ActionEvent event){
+        labelPointAdded.setText("     ");
+        if (table.getItems().size() > 0){
+            String option = SPACE_SIN_NUMBER;
+            if(comboExport.getValue() != null)
+                option = comboExport.getValue();
+            //System.out.println("export = " + comboExport.getValue());
+            switch(option){
+                case SPACE_SIN_NUMBER:
+                    VertexPolygon.savePolygonSinNum_space(table.getItems());
+                    break;
+                case SPACE_WITH_NUMBER:
+                    VertexPolygon.savePolygonWithNum_space(table.getItems());
+                    break;
+                case COMMA_SIN_NUMBER:
+                    VertexPolygon.savePolygonSinNum_comma(table.getItems());
+                    break;
+                case COMMA_WITH_NUMBER:
+                    VertexPolygon.savePolygonWithNum_comma(table.getItems());
+                    break;
+                default:
+                    MessageBox.show("Choose file format.", "Insufficient information");
+            }
+        }else{
+            MessageBox.show("The list is empty.", "Data error");
+        }
+    }
+
+    /*
+     * Manual point entry to the table
+     */
+    private void addVertex(ActionEvent event){
+        FOUND: {
+            Vertex v = new Vertex();
+
+            if(textPointNum.getText().trim().length() < 1){
+                if(table.getItems() == null){
+                    v.setNumber(1);
+                }else{
+                    v.setNumber(table.getItems().size() + 1);
+                }
+            }else{
+                if(Integer.parseInt(textPointNum.getText()) < table.getItems().size()){
+                    MessageBox.show("Number " + Integer.parseInt(textPointNum.getText()) +
+                            " is already taken", "Point Number Warning");
+                    break FOUND;
+                }else{
+                    v.setNumber(Integer.parseInt(textPointNum.getText()));
+                }
+            }
+            if((textPointEast.getText().trim().length() > 0) & (textPointNorth.getText().trim().length() > 0)){
+                v.setEasting(Integer.parseInt(textPointEast.getText()));
+                v.setNorthing(Integer.parseInt(textPointNorth.getText()));
+                table.getItems().add(v);
+                textPointNum.clear();
+                textPointEast.clear();
+                textPointNorth.clear();
+                labelPointAdded.setStyle("-fx-text-fill: blue;");
+                labelPointAdded.setText("  OK!");
+            }else{
+                labelPointAdded.setStyle("-fx-text-fill: red;");
+                labelPointAdded.setText("Fail!");
+            }
+        }
+    }
+
+    /*
+     * Deletes point from the table
+     */
+    private void deleteVertex(ActionEvent event){
+        ObservableList<Vertex> selected, vertexes;
+        vertexes = table.getItems();
+        selected = table.getSelectionModel().getSelectedItems();
+        for(Vertex v: selected){
+            vertexes.remove(v);
+        }
+    }
+
+    /*
+     * Area and Perimeter calculations and result values setting
+     */
+    private void setArea(ActionEvent event){
+        double sqMetres = calcArea(table.getItems());  // area is in square metres
+        textCalcAreaFt2.setText(String.format("%.1f", sqMetres * 10.76391041671));
+        textCalcAreaMetre2.setText(String.format("%.1f", sqMetres));
+        textCalcAreaAcre.setText(String.format("%.2f", sqMetres * 0.000247105));
+        textCalcAreaHa.setText(String.format("%.2f", sqMetres * 0.0001));
+    }
+
+    private void setPerimeter(ActionEvent event){
+        double metres = calcPerim(table.getItems());  // perimeter is in metres
+        textCalcPerimFt.setText(String.format("%.1f", metres * 3.280840));
+        textCalcPerimMetre.setText(String.format("%.1f", metres));
+        textCalcPerimKm.setText(String.format("%.2f", metres / 1000));
+        textCalcPerimMile.setText(String.format("%.2f", metres / 1609.3440));
+
+    }
+
+    private double calcArea(ObservableList<Vertex> vertexesOL){  //calculates area in the same units
+        labelPointAdded.setText("     ");
+        int num = vertexesOL.size();  //number of vertexes
+        int last = num-1;
+        int x[] = new int[num];  //eastings of point number i
+        int y[] =  new int[num]; //northings of point number i
+        int i = 0;
+        double result = 0;
+        for(Vertex v: vertexesOL){
+            x[i] = v.getEasting();
+            y[i] = v.getNorthing();
+            i++;
+        }
+        for(int n = 0; n < last; n++){
+            result = result + ((x[n]*y[n+1]) - (y[n]*x[n+1]));
+        }
+        result = (result + ((x[last]*y[0]) - (y[last]*x[0]))) * 0.5;
+        result = Math.abs(result);
+        return result;
+    }
+
+    private double calcPerim(ObservableList<Vertex> vertexesOL){   //calculates perimeter in the same units
+        labelPointAdded.setText("     ");
+        int num = vertexesOL.size();  //number of vertexes
+        int last = num-1;
+        int x[] = new int[num];  //eastings of point number i
+        int y[] =  new int[num]; //northings of point number i
+        int i = 0;
+        double result = 0;
+        for(Vertex v: vertexesOL){
+            x[i] = v.getEasting();
+            y[i] = v.getNorthing();
+            i++;
+        }
+        for(int n = 0; n < last; n++){
+            result = result + Math.sqrt(Math.pow((x[n] - x[n+1]) ,2) + Math.pow((y[n] - y[n+1]) ,2));
+        }
+        result = result + Math.sqrt(Math.pow((x[last] - x[0]) ,2) + Math.pow((y[last] - y[0]) ,2));
+        return result;
+    }
+
 }    
  
     
-/*     
-
-Label labelPromo = new Label();
-String promo = "\n\n      - calculating distance between 2 points given OS Grid References\n\n"
-		+ "      - converting OS Grid Reference to Latitude/Longitude in OSGB36\n\n"
-		+ "      - converting OS Grid Reference to Latitude/Longitude in WGS84\n\n"
-		+ "      - calculating distance between 2 points given Latitude/Longitude\n\n"
-		+ "      - calculating bearing between two points given OS Grid References\n\n"
-		+ "      - calculating bearing between two points given Latitude/Longitude\n\n"
-		+ "      ...and more";
-labelPromo.setText(promo);
-labelPromo.setStyle("-fx-font-family: \"Arial\"; -fx-font-size: 16; -fx-text-fill: darkred;");
-HBox hboxPromo = new HBox(labelPromo);
-Label labelComingSoon = new Label("COMING SOON");
-labelComingSoon.setStyle("-fx-font-family: \"Arial\"; -fx-font-size: 20; -fx-text-fill: red;");
-labelComingSoon.setRotate(-30);
-labelComingSoon.setAlignment(Pos.TOP_RIGHT);
-labelComingSoon.setPrefHeight(100);
-HBox hboxComingSoon = new HBox(labelComingSoon);
-hboxComingSoon.setAlignment(Pos.TOP_RIGHT);
-
-tabC_borderPane.setCenter(hboxPromo);
-tabC_borderPane.setBottom(hboxComingSoon);
-*/
-        
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
