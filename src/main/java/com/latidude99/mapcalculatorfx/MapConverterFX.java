@@ -63,7 +63,8 @@ import javafx.util.converter.IntegerStringConverter;
  * The GUI is built here, programmatically instead of declaring
  * Views in FXML files with Controllers (MVC pattern) to see if
  * this would be a viable alternative and learn building GUI with
- * Java code.
+ * Java code. Turns out it's not, at least not for anything larger
+ * than a few hundred lines.
  *
  * Created after a few months of learning Java and programming at all.
  *
@@ -2326,12 +2327,10 @@ public class MapConverterFX extends Application {
     	    if(mapScale < 1){
             	lblGap3a.setText("bigger than 1 : 1");
             	lblGap3a.setStyle("-fx-font-family: \"Arial\"; -fx-font-size: 11; -fx-text-fill: red;");
-            	//txtScaleFractional.setText(",");	
             }else{
             	if(mapScale > 99999999){
                 	lblGap3a.setText("smaller than 1 : 99,999,999");
                 	lblGap3a.setStyle("-fx-font-family: \"Arial\"; -fx-font-size: 11; -fx-text-fill: red;");
-                	//txtScaleFractional.setText(",");	
             	}else{
             		txtScaleFractional.setText(NumberFormat.getIntegerInstance().format((int) mapScale));
             	}
@@ -2339,28 +2338,24 @@ public class MapConverterFX extends Application {
     	    if((63360 / mapScale) < 0.1){
             	lblGap3b.setText("less than 0.1 inch to the mile");
             	lblGap3b.setStyle("-fx-font-family: \"Arial\"; -fx-font-size: 11; -fx-text-fill: red;");
-            	//txtScaleInch.setText(",");	
             }else{
             	txtScaleInch.setText(String.format("%.1f", (63360 / mapScale)));
             }
         if((mapScale / 63360) < 0.001){
         	lblGap3c.setText("less than 0.001 mile to an inch");
         	lblGap3c.setStyle("-fx-font-family: \"Arial\"; -fx-font-size: 11; -fx-text-fill: red;");
-        	//txtScaleMile.setText(",");	
         }else{
         	txtScaleMile.setText(String.format("%.3f", (mapScale / 63360)));
         }
         if((100000 / mapScale) < 0.1){
         	lblGap3d.setText("less than 0.1 cm to a km");
         	lblGap3d.setStyle("-fx-font-family: \"Arial\"; -fx-font-size: 11; -fx-text-fill: red;");
-        	//txtScaleCm.setText(",");	
         }else{
         	txtScaleCm.setText(String.format("%.1f", (100000 / mapScale)));
         }
         if((mapScale / 100000) < 0.001){
         	lblGap3e.setText("less than 0.001 km to a cm");
         	lblGap3e.setStyle("-fx-font-family: \"Arial\"; -fx-font-size: 11; -fx-text-fill: red;");
-        	//txtScaleKm.setText(",");	
         }else{
         	txtScaleKm.setText(String.format("%.3f", (mapScale / 100000)));
         }
@@ -2368,10 +2363,11 @@ public class MapConverterFX extends Application {
     
     private void clearFieldsTabB(){
     	txtMm.clear(); txtCm.clear(); txtIn.clear();
-    	txtKm.clear(); txtMetre.clear(); txtMile.clear(); txtFt.clear(); txtYard.clear();
-    	txtScaleFractional.clear();	txtScaleInch.clear(); txtScaleMile.clear();	txtScaleCm.clear();	txtScaleKm.clear();
-    	lblGap1a.setText("");
-    	lblGap3a.setText(""); lblGap3b.setText(""); lblGap3c.setText(""); lblGap3d.setText(""); lblGap3e.setText("");
+    	txtKm.clear(); txtMetre.clear(); txtMile.clear(); txtFt.clear();
+    	txtYard.clear(); txtScaleFractional.clear(); txtScaleInch.clear();
+    	txtScaleMile.clear();	txtScaleCm.clear();	txtScaleKm.clear();
+    	lblGap1a.setText(""); lblGap3a.setText(""); lblGap3b.setText("");
+    	lblGap3c.setText(""); lblGap3d.setText(""); lblGap3e.setText("");
     	count = 0;
     }
 
@@ -2413,7 +2409,8 @@ public class MapConverterFX extends Application {
     							distance.setDist(Double.parseDouble(textDistFt.getText()) / 3.280840); //base distance in metres
     							setDistFields();
     						}else{
-    							MessageBox.show("Plese fill in one of the DISTANCE fields", "Input error");
+    							MessageBox.show(
+    							        "Please fill in one of the DISTANCE fields", "Input error");
     						}
     					}
     				}
@@ -2654,7 +2651,7 @@ public class MapConverterFX extends Application {
 		textLeftOsSixFigure.clear();
 		textLeftOsSixFigure.setPromptText("e.g. TQ571168");
 		textLeftOSEast.setPromptText("Easting (6 digits)");
-		textLeftOSNorth.setPromptText("Norting (6 digits)");
+		textLeftOSNorth.setPromptText("Northing (6 digits)");
 		textLeftOSEast.clear();
 		textLeftOSNorth.clear();
 		textLeftWGS84_degDec_Lat.clear();
@@ -2680,7 +2677,7 @@ public class MapConverterFX extends Application {
 		textLeftOSEast.clear();
 		textLeftOSNorth.clear();
 		textLeftOSEast.setPromptText("Easting (6 digits)");
-		textLeftOSNorth.setPromptText("Norting (6 digits)");
+		textLeftOSNorth.setPromptText("Northing (6 digits)");
 		textLeftWGS84_degDec_Lat.clear();
 		textLeftWGS84_degDec_Lon.clear();
 		textLeftWGS84_degDecMin_Lat.clear();
@@ -2726,7 +2723,7 @@ public class MapConverterFX extends Application {
 		textLeftOsSixFigure.clear();
 		textLeftOsSixFigure.setPromptText("e.g. TQ571168");
 		textLeftOSEast.setPromptText("Easting (6 digits)");
-		textLeftOSNorth.setPromptText("Norting (6 digits)");
+		textLeftOSNorth.setPromptText("Northing (6 digits)");
 		textLeftOSEast.clear();
 		textLeftOSNorth.clear();
 		textLeftWGS84_degDecMin_Lat.clear();
@@ -2750,7 +2747,7 @@ public class MapConverterFX extends Application {
 		textLeftOsSixFigure.clear();
 		textLeftOsSixFigure.setPromptText("e.g. TQ571168");
 		textLeftOSEast.setPromptText("Easting (6 digits)");
-		textLeftOSNorth.setPromptText("Norting (6 digits)");
+		textLeftOSNorth.setPromptText("Northing (6 digits)");
 		textLeftOSEast.clear();
 		textLeftOSNorth.clear();
 		textLeftWGS84_degDec_Lat.clear();
@@ -2772,7 +2769,7 @@ public class MapConverterFX extends Application {
 		textLeftOsSixFigure.clear();
 		textLeftOsSixFigure.setPromptText("e.g. TQ571168");
 		textLeftOSEast.setPromptText("Easting (6 digits)");
-		textLeftOSNorth.setPromptText("Norting (6 digits)");
+		textLeftOSNorth.setPromptText("Northing (6 digits)");
 		textLeftOSEast.clear();
 		textLeftOSNorth.clear();
 		textLeftWGS84_degDec_Lat.clear();
@@ -2995,7 +2992,7 @@ public class MapConverterFX extends Application {
 			textRightOSEast.clear();
 			textRightOSNorth.clear();
 			textRightOSEast.setPromptText("Easting (6 digits)");
-			textRightOSNorth.setPromptText("Norting (6 digits)");
+			textRightOSNorth.setPromptText("Northing (6 digits)");
 			textRightWGS84_degDec_Lat.clear();
 			textRightWGS84_degDec_Lon.clear();
 			textRightWGS84_degDecMin_Lat.clear();
@@ -3041,7 +3038,7 @@ public class MapConverterFX extends Application {
 			textRightOsSixFigure.clear();
 			textRightOsSixFigure.setPromptText("e.g. TQ571168");
 			textRightOSEast.setPromptText("Easting (6 digits)");
-			textRightOSNorth.setPromptText("Norting (6 digits)");
+			textRightOSNorth.setPromptText("Northing (6 digits)");
 			textRightOSEast.clear();
 			textRightOSNorth.clear();
 			
@@ -3066,7 +3063,7 @@ public class MapConverterFX extends Application {
 			textRightOsSixFigure.clear();
 			textRightOsSixFigure.setPromptText("e.g. TQ571168");
 			textRightOSEast.setPromptText("Easting (6 digits)");
-			textRightOSNorth.setPromptText("Norting (6 digits)");
+			textRightOSNorth.setPromptText("Northing (6 digits)");
 			textRightOSEast.clear();
 			textRightOSNorth.clear();
 			
@@ -3091,7 +3088,7 @@ public class MapConverterFX extends Application {
 			textRightOsSixFigure.clear();
 			textRightOsSixFigure.setPromptText("e.g. TQ571168");
 			textRightOSEast.setPromptText("Easting (6 digits)");
-			textRightOSNorth.setPromptText("Norting (6 digits)");
+			textRightOSNorth.setPromptText("Northing (6 digits)");
 			textRightOSEast.clear();
 			textRightOSNorth.clear();
 			
@@ -3304,7 +3301,8 @@ public class MapConverterFX extends Application {
      * Area and Perimeter calculations and result values setting
      */
     private void setArea(ActionEvent event){
-        double sqMetres = calcArea(table.getItems());  // area is in square metres
+        labelPointAdded.setText("     ");
+        double sqMetres = AreaAndPerimeter.calcArea(table.getItems());  // area is in square metres
         textCalcAreaFt2.setText(String.format("%.1f", sqMetres * 10.76391041671));
         textCalcAreaMetre2.setText(String.format("%.1f", sqMetres));
         textCalcAreaAcre.setText(String.format("%.2f", sqMetres * 0.000247105));
@@ -3312,7 +3310,8 @@ public class MapConverterFX extends Application {
     }
 
     private void setPerimeter(ActionEvent event){
-        double metres = calcPerim(table.getItems());  // perimeter is in metres
+        labelPointAdded.setText("     ");
+        double metres = AreaAndPerimeter.calcPerim(table.getItems());  // perimeter is in metres
         textCalcPerimFt.setText(String.format("%.1f", metres * 3.280840));
         textCalcPerimMetre.setText(String.format("%.1f", metres));
         textCalcPerimKm.setText(String.format("%.2f", metres / 1000));
@@ -3320,46 +3319,7 @@ public class MapConverterFX extends Application {
 
     }
 
-    private double calcArea(ObservableList<Vertex> vertexesOL){  //calculates area in the same units
-        labelPointAdded.setText("     ");
-        int num = vertexesOL.size();  //number of vertexes
-        int last = num-1;
-        int x[] = new int[num];  //eastings of point number i
-        int y[] =  new int[num]; //northings of point number i
-        int i = 0;
-        double result = 0;
-        for(Vertex v: vertexesOL){
-            x[i] = v.getEasting();
-            y[i] = v.getNorthing();
-            i++;
-        }
-        for(int n = 0; n < last; n++){
-            result = result + ((x[n]*y[n+1]) - (y[n]*x[n+1]));
-        }
-        result = (result + ((x[last]*y[0]) - (y[last]*x[0]))) * 0.5;
-        result = Math.abs(result);
-        return result;
-    }
 
-    private double calcPerim(ObservableList<Vertex> vertexesOL){   //calculates perimeter in the same units
-        labelPointAdded.setText("     ");
-        int num = vertexesOL.size();  //number of vertexes
-        int last = num-1;
-        int x[] = new int[num];  //eastings of point number i
-        int y[] =  new int[num]; //northings of point number i
-        int i = 0;
-        double result = 0;
-        for(Vertex v: vertexesOL){
-            x[i] = v.getEasting();
-            y[i] = v.getNorthing();
-            i++;
-        }
-        for(int n = 0; n < last; n++){
-            result = result + Math.sqrt(Math.pow((x[n] - x[n+1]) ,2) + Math.pow((y[n] - y[n+1]) ,2));
-        }
-        result = result + Math.sqrt(Math.pow((x[last] - x[0]) ,2) + Math.pow((y[last] - y[0]) ,2));
-        return result;
-    }
 
 }    
  
