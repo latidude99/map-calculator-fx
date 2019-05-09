@@ -8,22 +8,21 @@
 
 
 
-
-Copyright (C) 2017  Piotr Czapik
+Copyright (C) 2017 - 2019  Piotr Czapik
 @author Piotr Czapik
-@version 4.01
+@version 4.5
 
-Map Calculator is free software: you can redistribute it and/or modify
+MapCalculatorFX is free software: you can redistribute it and/or modify
 it under the terms of the GNU General Public License as published by
 the Free Software Foundation, version 2 of the License.
 
-Map Calculator is distributed in the hope that it will be useful,
+MapCalculatorFX is distributed in the hope that it will be useful,
 but WITHOUT ANY WARRANTY; without even the implied warranty of
 MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU General Public License for more details.
 
 You should have received a copy of the GNU General Public License
-along with Map Calculator.  If not, see <http://www.gnu.org/licenses/>
+along with MapCalculatorFX.  If not, see <http://www.gnu.org/licenses/>
 or write to: latitude1001101@gmail.com
 
 Libraries used:
